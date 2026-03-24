@@ -52,7 +52,7 @@ Each card records: what was chosen, why it won over alternatives, complexity, im
 
 ```bash
 # Clone this repo
-git clone https://github.com/0xvox/data-algo-skill.git
+git clone https://github.com/Fearvox/data-algo-skill.git
 
 # Copy skills to global commands
 cp -r data-algo-skill/data-algo ~/.claude/commands/data-algo
