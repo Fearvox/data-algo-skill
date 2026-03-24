@@ -334,6 +334,38 @@ The runtime environment. Skills install to `~/.claude/commands/` and trigger bas
 
 ---
 
+## Contributing
+
+We're building an open algorithm knowledge layer for AI coding agents — and we'd love your help.
+
+**See [ROADMAP.md](ROADMAP.md)** for the full vision, planned features, and contribution guidelines.
+
+#### Quick ways to contribute
+
+| What | How |
+|------|-----|
+| **Add algorithms we're missing** | Run `/import-knowledge <repo-url>`, review the diff, open a PR |
+| **Report a wrong complexity** | Open an issue with the correct Big-O and a source link |
+| **Add a new skill branch** | Create `data-algo-<domain>/` following our existing pattern |
+| **Improve Chinese glossary** | Add terms to `glossary-zh.md` with colloquial mappings |
+| **Fix a bug** | Describe what you said, what happened, what should have happened |
+
+#### Issue templates
+
+- **Bug Report** — skill branch + trigger + expected vs actual
+- **Knowledge Gap** — algorithm name + source + category + why it matters
+- **Feature Request** — branch + problem + proposal + alternatives
+
+#### PR checklist
+
+- [ ] No duplicate entries (check existing references first)
+- [ ] Correct Big-O notation (uppercase `O`, not zero)
+- [ ] Source attribution included
+- [ ] Chinese glossary updated if applicable
+- [ ] `/sync` run to update README
+
+---
+
 ## License
 
 MIT
