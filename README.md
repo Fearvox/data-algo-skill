@@ -10,6 +10,7 @@
   <a href="#installation">Installation</a> &nbsp;&middot;&nbsp;
   <a href="#usage">Usage</a> &nbsp;&middot;&nbsp;
   <a href="#knowledge-base">Knowledge Base</a> &nbsp;&middot;&nbsp;
+  <a href="#data-algo-social">Social</a> &nbsp;&middot;&nbsp;
   <a href="#data-algo-viz">Visualization</a> &nbsp;&middot;&nbsp;
   <a href="#benchmark-results">Benchmarks</a>
 </p>
@@ -108,16 +109,17 @@ The skill triggers automatically when you say things like:
 
 ## Knowledge Base
 
-Curated from two complementary algorithm repositories, organized into 5 reference files:
+Curated from three complementary repositories, organized into 11 reference files across two skill branches:
 
 | Source | Focus | What we extracted |
 |--------|-------|-------------------|
 | [trekhleb/javascript-algorithms](https://github.com/trekhleb/javascript-algorithms) | Implementation-first — ~100 algorithms with JS code, tests, Big-O | Data structure selection matrices, algorithm domain index, paradigm flowcharts, complexity tables |
 | [labuladong/fucking-algorithm](https://github.com/labuladong/fucking-algorithm) | Thinking-first — 500+ problems with reusable mental frameworks (133k stars) | Problem-solving templates, pattern recognition heuristics, Chinese-native algorithm explanations, DP/backtracking/BFS decision trees |
+| [twitter/the-algorithm](https://github.com/twitter/the-algorithm) | Production-first — Twitter/X's open-source recommendation system | Signal collection patterns, two-stage ranking, SimClusters community detection, PageRank reputation, content filtering pipelines |
 
-The two repos are complementary: `javascript-algorithms` gives us the **what** (implementations + complexity data), while `labuladong` gives us the **how to think** (systematic frameworks for recognizing which algorithm fits a new problem). Together they form a knowledge base that covers both lookup and reasoning.
+Three complementary perspectives: `javascript-algorithms` gives us the **what** (implementations + complexity data), `labuladong` gives us the **how to think** (systematic frameworks for recognizing patterns), and `twitter/the-algorithm` gives us the **how it works at scale** (production-grade social platform patterns). Together they form a knowledge base spanning from theory to implementation to production.
 
-### Reference files
+### data-algo reference files
 
 | File | Contents |
 |------|----------|
@@ -126,6 +128,17 @@ The two repos are complementary: `javascript-algorithms` gives us the **what** (
 | `paradigms.md` | Decision flowchart for Brute Force, Greedy, D&C, DP, Backtracking + patterns: Two Pointers, Sliding Window, Monotonic Stack, Prefix Sums, Binary Search on Answer |
 | `big-o.md` | Growth rate tables, DS operation complexity, sorting comparison (stability/space), graph + string algo complexity, computation helpers for viz |
 | `glossary-zh.md` | 60+ Chinese-English term mappings + colloquial → algorithm lookup ("太慢了" → complexity analysis, "去重" → Hash Set, "找最大K个" → Heap) |
+
+### data-algo-social reference files
+
+| File | Contents |
+|------|----------|
+| `signal-collection.md` | 12 signal types (explicit/implicit/negative), collection architecture, real-time vs batch decision matrix, rate limiter + circuit breaker patterns, platform-specific signal mapping (Douyin/TikTok/XHS) |
+| `candidate-generation.md` | SimClusters community detection, multi-source candidate mixing (4 sources), UTEG graph recommendation, FRS follow recommendations, trending velocity detection |
+| `ranking-pipeline.md` | Two-stage ranking (light→heavy), ~6000 feature taxonomy, Twitter's published scoring weights, diversity mixing, per-surface ranking configuration |
+| `content-classification.md` | Inverted index topic extraction (solves O(P×C×K) → O(P×T)), CJK tokenizer, embedding progression path, 7-category bilingual taxonomy, SimHash dedup, niche detection |
+| `graph-analysis.md` | PageRank reputation scoring, growth velocity/EMA, Z-score anomaly detection, composite influence scoring, random walk content discovery |
+| `trust-safety.md` | Multi-layer content filtering, quality scoring formula, SimHash near-dedup, bot detection heuristics, PII masking, circuit breaker, audit logging |
 
 ---
 
@@ -146,6 +159,30 @@ The skill will:
 4. **Report** — present a health summary with prioritized optimization targets
 
 One command gives you a complete algorithmic map of any project — no manual profiling needed.
+
+---
+
+## data-algo-social
+
+Specialized branch for social media data pipelines. Applies Twitter/X's production-grade recommendation patterns to any social platform project — collectors, ranking engines, content classifiers, user graph analysis, and content moderation.
+
+| Your Problem | Twitter Pattern | Reference |
+|-------------|----------------|-----------|
+| What signals to collect from Douyin/TikTok/XHS | unified-user-actions event taxonomy | `signal-collection.md` |
+| How to recommend content across platforms | SimClusters community detection + cr-mixer | `candidate-generation.md` |
+| How to rank a content feed | Light ranker → heavy ranker (two-stage) | `ranking-pipeline.md` |
+| How to categorize posts by topic | Inverted index topic extraction | `content-classification.md` |
+| How to score creator influence | tweepcred PageRank + composite scoring | `graph-analysis.md` |
+| How to filter spam and low-quality content | visibility-filters + T&S models | `trust-safety.md` |
+
+#### Trigger keywords
+
+| Language | Keywords |
+|----------|----------|
+| English | `collector` · `ranking` · `feed` · `timeline` · `signal` · `engagement` · `content quality` · `spam` |
+| Chinese | `采集` · `推荐算法` · `信号` · `内容分类` · `热度` · `信息流` · `粉丝` · `互动` |
+
+Every reference file includes TypeScript implementations and three scale tiers (hobby / growth / scale) so patterns work whether you're processing 1K or 1M posts.
 
 ---
 
@@ -213,22 +250,32 @@ data-algo-skill/
 │       ├── big-o.md              # Complexity tables + computation helpers
 │       └── glossary-zh.md        # Chinese-English algorithm glossary
 │
-├── data-algo-viz/                # Visualization companion
-│   ├── SKILL.md                  # Viz skill definition
+├── data-algo-social/                # Social platform branch
+│   ├── SKILL.md                     # Social-specific workflow + Twitter pattern mapping
+│   └── references/
+│       ├── signal-collection.md     # Event taxonomy, collection patterns, rate limiting
+│       ├── candidate-generation.md  # SimClusters, UTEG, trending detection
+│       ├── ranking-pipeline.md      # Two-stage ranking, feature engineering
+│       ├── content-classification.md # Inverted index, embeddings, CJK tokenizer
+│       ├── graph-analysis.md        # PageRank, growth analysis, influence scoring
+│       └── trust-safety.md          # Content filtering, quality scoring, PII masking
+│
+├── data-algo-viz/                   # Visualization companion
+│   ├── SKILL.md                     # Viz skill definition
 │   ├── scripts/
-│   │   ├── render.mjs            # Terminal renderer (ink)
-│   │   └── package.json          # @json-render/ink dependencies
-│   ├── templates/                # JSON spec templates
+│   │   ├── render.mjs               # Terminal renderer (ink)
+│   │   └── package.json             # @json-render/ink dependencies
+│   ├── templates/                   # JSON spec templates
 │   │   ├── complexity-compare.json
 │   │   ├── before-after.json
 │   │   ├── profile-dashboard.json
 │   │   └── benchmark.json
 │   └── references/
-│       └── component-props.md    # ink component prop reference
+│       └── component-props.md       # ink component prop reference
 │
-├── .claude/commands/sync.md      # /sync command for update workflow
-├── data-algo.skill               # Packaged skill file
-├── data-algo-viz.skill           # Packaged viz skill file
+├── .claude/commands/sync.md         # /sync command for update workflow
+├── data-algo.skill                  # Packaged skill file
+├── data-algo-viz.skill              # Packaged viz skill file
 └── README.md
 ```
 
@@ -261,6 +308,13 @@ The thinking backbone. 500+ problems with step-by-step mental frameworks (133k s
 </td>
 </tr>
 <tr>
+<td width="50%">
+
+### [twitter/the-algorithm](https://github.com/twitter/the-algorithm)
+
+The production backbone. Twitter/X's open-source recommendation system — we extracted production-grade patterns for signal collection, two-stage ranking, SimClusters community detection, PageRank reputation, content filtering, and trust/safety into 6 reference files with TypeScript implementations and three scale tiers.
+
+</td>
 <td width="50%">
 
 ### [vercel-labs/json-render](https://github.com/vercel-labs/json-render)
