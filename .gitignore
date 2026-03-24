@@ -1,6 +1,7 @@
 node_modules/
 data-algo-workspace/
 evals/test-files/
+docs/superpowers/
 *.output
 .DS_Store
 package-lock.json
