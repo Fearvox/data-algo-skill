@@ -54,6 +54,9 @@ All complexities are **worst case** unless noted.
 | Disjoint Set | — | O(α(n)) | O(α(n)) | — | α ≈ inverse Ackermann ≈ O(1) |
 | Bloom Filter | — | O(k) | O(k) | — | k = hash functions; false positives |
 | LRU Cache | — | O(1) | O(1) | O(1) | Hash Map + Doubly Linked List |
+| KD Tree | — | O(log n) avg | O(log n) | O(log n) | k-dimensional; O(n) worst |
+| Sqrt Decomposition | O(1) | O(√n) | O(1) | — | Block-based; simpler than Segment Tree |
+| van Emde Boas | — | O(log log U) | O(log log U) | O(log log U) | U = universe size; O(U) space |
 
 ---
 
@@ -72,6 +75,8 @@ All complexities are **worst case** unless noted.
 | Radix Sort | O(n*d) | O(n*d) | O(n*d) | O(n+k) | Yes | No | d = digits, k = base |
 | Bucket Sort | O(n+k) | O(n+k) | O(n^2) | O(n+k) | Yes | No | Uniform distribution |
 | Tim Sort | O(n) | O(n log n) | O(n log n) | O(n) | Yes | No | JS/Python default; hybrid |
+| Cocktail Sort | O(n) | O(n^2) | O(n^2) | O(1) | Yes | Yes | Bidirectional bubble sort |
+| Bogo Sort | O(n) | O((n+1)!) | O(∞) | O(1) | No | Yes | Random shuffle; joke only |
 
 ---
 
@@ -89,6 +94,11 @@ All complexities are **worst case** unless noted.
 | Topological Sort | O(V+E) | O(V) | DAG ordering, dependencies |
 | Kosaraju (SCC) | O(V+E) | O(V) | Strongly connected components |
 | Tarjan (Art. Points) | O(V+E) | O(V) | Network reliability |
+| A* Search | O(E) best | O(V) | Shortest path with heuristic |
+| Edmonds-Karp (Max Flow) | O(V*E^2) | O(V^2) | Maximum flow in network |
+| Check Bipartite | O(V+E) | O(V) | 2-coloring graph test |
+| Transitive Closure | O(V^3) | O(V^2) | Reachability matrix |
+| Gale-Shapley | O(n^2) | O(n) | Stable matching |
 
 ---
 
@@ -101,6 +111,9 @@ All complexities are **worst case** unless noted.
 | Rabin-Karp | O(n+m) avg | O(1) | Multiple pattern search |
 | Z Algorithm | O(n+m) | O(n) | Pattern matching alternative |
 | Levenshtein | O(n*m) | O(n*m) | Edit distance, fuzzy match |
+| Wildcard Matching | O(n*m) | O(n*m) | Pattern with ? and * |
+| Min Window Substring | O(n) | O(k) | Smallest window with all chars |
+| Longest Common Prefix | O(S) | O(1) | Shared prefix, S = total chars |
 
 ---
 

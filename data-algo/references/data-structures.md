@@ -21,6 +21,13 @@ Use this reference when the problem involves choosing or implementing a data str
 | Connected components / union | Disjoint Set (Union-Find) | Near O(1) amortized with path compression |
 | Sequential traversal | Linked List | O(1) insert/delete at known position |
 | Bidirectional traversal | Doubly Linked List | O(1) forward + backward |
+| Frequency-based eviction | LFU Cache | O(1) get + put, evicts least used |
+| Fixed-size circular buffer | Circular Queue | O(1) enqueue/dequeue, no resize |
+| Round-robin scheduling | Circular Linked List | Natural cycle with no null end |
+| Multidimensional nearest-neighbor | KD Tree | O(log n) avg search in k dimensions |
+| Block-based range queries | Sqrt Decomposition | O(√n) query, simpler than Segment Tree |
+| Disk-optimized ordered data | B-Tree | O(log n), high branching, fewer disk reads |
+| Integer universe, predecessor/successor | van Emde Boas Tree | O(log log U) operations |
 
 ---
 
@@ -157,3 +164,68 @@ Use this reference when the problem involves choosing or implementing a data str
 - **Use when**: Caching with bounded memory; memoization with size limit; page replacement; API response caching
 - **Avoid when**: Access pattern is random (no temporal locality); all items accessed equally; need LFU instead
 - **Ref**: `src/data-structures/lru-cache`
+
+### LFU Cache `A`
+- **What**: Fixed-size cache that evicts least frequently used entries. Tracks access count per key
+- **Implementation**: Hash Map + frequency-to-keys map (doubly linked list per frequency)
+- **Time**: Get O(1), Put O(1)
+- **Space**: O(capacity)
+- **Use when**: Access patterns have hot/cold items with stable popularity; CDN caching; database query cache
+- **Avoid when**: Access patterns are bursty (recently popular items may be evicted); simpler LRU suffices; frequency tracking overhead not justified
+- **Source**: `TheAlgorithms/JavaScript/Cache/LFUCache.js`
+
+### Circular Queue (Ring Buffer) `B`
+- **What**: Fixed-size queue using circular array with head/tail pointers wrapping around
+- **Time**: Enqueue O(1), Dequeue O(1), Peek O(1)
+- **Space**: O(capacity)
+- **Use when**: Fixed-size buffering (audio/video streaming); producer-consumer patterns; bounded task queues; embedded systems with fixed memory
+- **Avoid when**: Need unbounded growth; need random access to elements
+- **Source**: `TheAlgorithms/JavaScript/Data-Structures/Queue/CircularQueue.js`
+
+### Circular Linked List `B`
+- **What**: Singly linked list where last node points back to first (no null terminator)
+- **Time**: Same as Linked List. Traversal cycles forever without stop condition
+- **Space**: O(n)
+- **Use when**: Round-robin scheduling; circular buffers; turn-based game loops; Josephus problem; playlist repeat
+- **Avoid when**: Need clear start/end; traversal without careful termination condition is dangerous
+- **Source**: `TheAlgorithms/JavaScript/Data-Structures/Linked-List/SinglyCircularLinkedList.js`
+
+### Vector2 (2D Vector) `B`
+- **What**: Mathematical 2D vector with x, y components and standard operations (add, subtract, scale, dot product, magnitude, normalize)
+- **Time**: All operations O(1)
+- **Space**: O(1)
+- **Use when**: 2D game physics; graphics rendering; geometric computations; force/velocity calculations
+- **Avoid when**: Need higher dimensions (use general vector/matrix library)
+- **Source**: `TheAlgorithms/JavaScript/Data-Structures/Vectors/Vector2.js`
+
+### KD Tree (k-Dimensional Tree) `A`
+- **What**: Space-partitioning tree for organizing points in k-dimensional space. Each level splits on a different dimension (cycle through x, y, z, ...)
+- **Time**: Build O(n log n), Search O(log n) avg / O(n) worst, Nearest neighbor O(log n) avg
+- **Space**: O(n)
+- **Use when**: Nearest-neighbor search in low dimensions (k < 20); range search in multidimensional data; computational geometry; spatial databases; game collision detection
+- **Avoid when**: High dimensionality (curse of dimensionality — use approximate methods instead); data changes frequently (rebalancing is expensive)
+- **Ref**: `keon/algorithms/data_structures/kd_tree`
+
+### Sqrt Decomposition `A`
+- **What**: Divide array into √n blocks, precompute aggregate per block. Query combines at most 2 partial blocks + √n full blocks
+- **Time**: Build O(n), Query O(√n), Update O(1) point / O(√n) block
+- **Space**: O(n)
+- **Use when**: Range queries where Segment Tree feels overkill; need simpler implementation; range sum/min/max with moderate update frequency
+- **Avoid when**: Need O(log n) performance (use Segment Tree); very frequent updates on ranges (use Segment Tree with lazy propagation)
+- **Ref**: `keon/algorithms/data_structures/sqrt_decomposition`
+
+### B-Tree `A`
+- **What**: Self-balancing tree with variable number of children per node (high branching factor). All leaves at same depth
+- **Time**: Search/Insert/Delete O(log n) — very few disk reads due to high fanout
+- **Space**: O(n)
+- **Use when**: Database indexing (MySQL, PostgreSQL use B+ trees); filesystem metadata; any scenario where data is on disk and minimizing I/O is critical
+- **Avoid when**: Data fits in RAM (BST/hash table simpler); don't need ordered access (hash table is faster)
+- **Ref**: `keon/algorithms/data_structures/b_tree`
+
+### van Emde Boas (vEB) Tree `A`
+- **What**: Tree structure for integer keys from universe {0, 1, ..., U-1}. Recursively divides universe into √U clusters
+- **Time**: Insert/Delete/Search/Predecessor/Successor all O(log log U)
+- **Space**: O(U) — can be large
+- **Use when**: Integer keys from bounded universe; need extremely fast predecessor/successor queries; priority queue with integer keys; router IP lookup tables
+- **Avoid when**: Universe size U is very large (space prohibitive); keys are not integers; simpler structures (heap, BST) suffice
+- **Ref**: `keon/algorithms/data_structures/veb_tree`

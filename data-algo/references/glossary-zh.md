@@ -26,6 +26,10 @@
 | 并查集 | Disjoint Set / Union-Find | structures | data-structures.md |
 | 布隆过滤器 | Bloom Filter | structures | data-structures.md |
 | LRU 缓存 | LRU Cache | structures | data-structures.md |
+| KD 树 / K维树 | KD Tree | structures | data-structures.md |
+| 分块 / 块状数组 | Sqrt Decomposition | structures | data-structures.md |
+| B 树 | B-Tree | structures | data-structures.md |
+| vEB 树 | van Emde Boas Tree | structures | data-structures.md |
 
 ## 排序算法
 
@@ -41,6 +45,19 @@
 | 计数排序 | Counting Sort | algorithms.md |
 | 基数排序 | Radix Sort | algorithms.md |
 | 桶排序 | Bucket Sort | algorithms.md |
+| 鸡尾酒排序 | Cocktail Sort | algorithms.md |
+| 猴子排序 | Bogo Sort | algorithms.md |
+
+## 图算法（补充）
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| A* 搜索 | A* Search | algorithms.md |
+| 最大流 | Maximum Flow (Ford-Fulkerson) | algorithms.md |
+| 二分图检测 | Check Bipartite | algorithms.md |
+| 传递闭包 | Transitive Closure | algorithms.md |
+| 岛屿计数 | Count Islands | algorithms.md |
+| 稳定匹配 | Gale-Shapley (Stable Matching) | algorithms.md |
 
 ## 搜索算法
 
@@ -83,6 +100,10 @@
 | 模式匹配 | Pattern Matching (KMP/Z/Rabin-Karp) | algorithms.md |
 | 最长公共子串 | Longest Common Substring | algorithms.md |
 | 正则匹配 | Regular Expression Matching | algorithms.md |
+| 通配符匹配 | Wildcard Matching | algorithms.md |
+| 最长公共前缀 | Longest Common Prefix | algorithms.md |
+| 最小覆盖子串 | Minimum Window Substring | algorithms.md |
+| 字符串解码 | Decode String | algorithms.md |
 
 ## 数学算法
 
@@ -99,6 +120,45 @@
 | 帕斯卡三角 / 杨辉三角 | Pascal's Triangle | algorithms.md |
 | 矩阵运算 | Matrix Operations | algorithms.md |
 | 离散傅里叶变换 | DFT / FFT | algorithms.md |
+| 中国剩余定理 | Chinese Remainder Theorem | algorithms.md |
+| 欧拉函数 | Euler's Totient Function | algorithms.md |
+| 扩展欧几里得算法 | Extended Euclidean Algorithm | algorithms.md |
+| 模逆元 | Modular Inverse | algorithms.md |
+| 进制转换 | Base Conversion | algorithms.md |
+| 格雷码 | Gray Code | algorithms.md |
+| RSA 加密 | RSA | algorithms.md |
+
+## 压缩与编码
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 哈夫曼编码 | Huffman Coding | algorithms.md |
+| 游程编码 | Run-Length Encoding (RLE) | algorithms.md |
+| Elias 编码 | Elias Coding | algorithms.md |
+
+## 流式与概率算法
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 蓄水池抽样 | Reservoir Sampling | algorithms.md |
+| Count-Min Sketch | Count-Min Sketch | algorithms.md |
+
+## 动态规划经典题（补充）
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 零钱兑换 | Coin Change | algorithms.md |
+| 最大乘积子数组 | Max Product Subarray | algorithms.md |
+| 鸡蛋掉落 | Egg Drop Problem | algorithms.md |
+| 切割钢条 | Rod Cutting | algorithms.md |
+| 单词拆分 | Word Break | algorithms.md |
+| 矩阵链乘法 | Matrix Chain Multiplication | algorithms.md |
+| 打家劫舍 | House Robber | algorithms.md |
+| 直方图最大矩形 | Largest Rectangle in Histogram | algorithms.md |
+| 合并区间 | Merge Intervals | algorithms.md |
+| 中缀转后缀 | Infix to Postfix | algorithms.md |
+| 约瑟夫问题 | Josephus Problem | algorithms.md |
+| 螺旋矩阵遍历 | Spiral Matrix Traversal | algorithms.md |
 
 ## 算法范式
 
@@ -134,3 +194,10 @@
 | "连通性" / "分组" | Union-Find / BFS/DFS |
 | "装满背包" / "预算内最大化" | Knapsack (DP) |
 | "所有组合" / "所有排列" | Backtracking |
+| "压缩" / "编码" | Huffman / RLE / Elias |
+| "随机采样" / "从流中取样" | Reservoir Sampling |
+| "频率估计" / "流式统计" | Count-Min Sketch |
+| "最大流" / "网络流" | Maximum Flow (Ford-Fulkerson) |
+| "空间搜索" / "最近邻" | KD Tree |
+| "匹配" / "配对" | Gale-Shapley (Stable Matching) |
+| "寻路" / "路径规划" | A* Search / Dijkstra |

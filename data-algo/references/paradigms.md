@@ -65,6 +65,10 @@ Does the problem ask for an optimal solution (min/max/best)?
 - Prim's MST — Always add cheapest edge to tree
 - Kruskal's MST — Sort edges, add if no cycle
 - Kadane's (Maximum Subarray) — Extend or restart subarray. O(n)
+- Huffman Coding — Build optimal prefix code tree from lowest-frequency chars. O(n log n)
+- Gale-Shapley — Proposers propose in preference order; stable matching guaranteed. O(n²)
+- Merge Intervals — Sort by start, merge overlapping. O(n log n)
+- A* Search — Always expand node with lowest f(n) = g(n) + h(n)
 
 **Implementation pattern**:
 ```
@@ -163,6 +167,13 @@ function solve(problem):
 - Floyd-Warshall — dp[k][i][j] = shortest path using first k intermediate nodes
 - Bellman-Ford — dp[v] = shortest distance to v, relax V-1 times
 - Regular Expression Matching — dp[i][j] = does text[0..i] match pattern[0..j]
+- Coin Change — dp[i] = min coins for amount i, try each denomination
+- Egg Drop — dp[k][n] = min trials with k eggs, n floors
+- Rod Cutting — dp[i] = max revenue for rod of length i
+- Word Break — dp[i] = can first i chars be segmented into dictionary words
+- Matrix Chain Multiplication — dp[i][j] = min ops to multiply matrices i..j (interval DP)
+- House Robber — dp[i] = max(dp[i-1], dp[i-2] + arr[i]) — non-adjacent selection
+- Max Product Subarray — track both max_product and min_product at each position
 
 **Implementation pattern**:
 ```
