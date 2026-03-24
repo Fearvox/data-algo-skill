@@ -228,11 +228,30 @@ data-algo-skill/
 
 ---
 
-## Credits
+## Built With
 
-- Knowledge base derived from [javascript-algorithms](https://github.com/trekhleb/javascript-algorithms) by [@trekhleb](https://github.com/trekhleb)
-- Terminal rendering powered by [json-render](https://github.com/vercel-labs/json-render) by Vercel Labs
-- Built with [skill-creator](https://github.com/anthropics/claude-code-plugins) from Claude Code Plugins
+### [trekhleb/javascript-algorithms](https://github.com/trekhleb/javascript-algorithms)
+
+The knowledge backbone of this skill. A comprehensive collection of ~100 algorithms and data structures implemented in JavaScript, each with its own README explaining the theory, complexity analysis, and use cases. We curated this into 5 structured reference files covering data structures, algorithms by domain, design paradigms, Big-O tables, and a Chinese-English glossary. The repo's clear categorization (by topic and by paradigm) directly informed the skill's pattern-recognition approach.
+
+**What we use**: Algorithm descriptions, complexity data, category taxonomy, paradigm classification, Big-O reference tables.
+**How we transformed it**: From a flat list of implementations into decision-oriented guides — "when to use X", "X vs Y trade-offs", pattern-matching flowcharts, and operation-count formulas for visualization.
+
+### [vercel-labs/json-render](https://github.com/vercel-labs/json-render)
+
+Powers the `data-algo-viz` terminal visualization. A framework that lets AI generate dynamic UIs from JSON specs while staying within a guardrailed component catalog. We use the `@json-render/ink` package specifically — it renders specs as rich terminal UI with tables, bar charts, progress bars, badges, and more.
+
+**What we use**: `@json-render/core` (catalog + spec system), `@json-render/ink` (terminal renderer with 20+ components).
+**Key components**: `Table` (algorithm comparison), `BarChart` (complexity scaling), `ProgressBar` (benchmark pass rates), `Badge` (status labels), `KeyValue` (metadata), `List` (analysis notes).
+**Non-obvious setup**: Ink requires TTY stdin; our `render.mjs` mocks `setRawMode`/`ref`/`unref` for non-interactive (piped) environments like Claude Code's Bash tool.
+
+### [anthropics/claude-code-plugins](https://github.com/anthropics/claude-code-plugins)
+
+The skill-creator plugin that powered the entire development workflow — from drafting SKILL.md to running parallel eval subagents to grading and benchmarking. The packaged `.skill` files were generated with its `package_skill.py` script.
+
+### [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+
+The runtime environment. Skills are installed to `~/.claude/commands/` and automatically appear in Claude's available skills list. The skill triggers based on the `description` field in SKILL.md frontmatter — when the user's message matches the described patterns, Claude loads the full skill and follows its workflow.
 
 ---
 
