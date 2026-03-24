@@ -1,0 +1,108 @@
+{
+  "_comment": "Template: Complexity Comparison. Replace {{placeholders}} with real data.",
+  "_usage": "Fill in options, compute operation counts, then render with scripts/render.mjs",
+  "root": "container",
+  "elements": {
+    "container": {
+      "type": "Box",
+      "props": { "flexDirection": "column", "padding": 1 },
+      "children": ["title", "divider1", "options", "divider2", "chart-heading", "chart", "divider3", "legend"]
+    },
+    "title": {
+      "type": "Heading",
+      "props": { "text": "Complexity Comparison", "level": "h1" },
+      "children": []
+    },
+    "divider1": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+    },
+    "options": {
+      "type": "Box",
+      "props": { "flexDirection": "column", "gap": 1 },
+      "children": ["option-a", "option-b"]
+    },
+    "option-a": {
+      "type": "Card",
+      "props": { "title": "{{option_a_name}} ⭐ Recommended" },
+      "children": ["option-a-complexity", "option-a-fit"]
+    },
+    "option-a-complexity": {
+      "type": "KeyValue",
+      "props": { "label": "Complexity", "value": "{{option_a_time}} time / {{option_a_space}} space" },
+      "children": []
+    },
+    "option-a-fit": {
+      "type": "KeyValue",
+      "props": { "label": "Why", "value": "{{option_a_reason}}" },
+      "children": []
+    },
+    "option-b": {
+      "type": "Card",
+      "props": { "title": "{{option_b_name}}" },
+      "children": ["option-b-complexity", "option-b-fit"]
+    },
+    "option-b-complexity": {
+      "type": "KeyValue",
+      "props": { "label": "Complexity", "value": "{{option_b_time}} time / {{option_b_space}} space" },
+      "children": []
+    },
+    "option-b-fit": {
+      "type": "KeyValue",
+      "props": { "label": "Why", "value": "{{option_b_reason}}" },
+      "children": []
+    },
+    "divider2": {
+      "type": "Divider",
+      "props": { "title": "Operations at Scale" },
+      "children": []
+    },
+    "chart-heading": {
+      "type": "Text",
+      "props": { "color": "gray" },
+      "children": ["chart-heading-text"]
+    },
+    "chart-heading-text": {
+      "type": "Text",
+      "props": { "children": "Lower is better — estimated operation count" },
+      "children": []
+    },
+    "chart": {
+      "type": "BarChart",
+      "props": {
+        "data": [
+          { "label": "{{option_a_name}} @ n=100", "value": "{{ops_a_100}}" },
+          { "label": "{{option_b_name}} @ n=100", "value": "{{ops_b_100}}" },
+          { "label": "{{option_a_name}} @ n=1K", "value": "{{ops_a_1k}}" },
+          { "label": "{{option_b_name}} @ n=1K", "value": "{{ops_b_1k}}" },
+          { "label": "{{option_a_name}} @ n=10K", "value": "{{ops_a_10k}}" },
+          { "label": "{{option_b_name}} @ n=10K", "value": "{{ops_b_10k}}" },
+          { "label": "{{option_a_name}} @ n=100K", "value": "{{ops_a_100k}}" },
+          { "label": "{{option_b_name}} @ n=100K", "value": "{{ops_b_100k}}" }
+        ]
+      },
+      "children": []
+    },
+    "divider3": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+    },
+    "legend": {
+      "type": "Box",
+      "props": { "gap": 2 },
+      "children": ["legend-a", "legend-b"]
+    },
+    "legend-a": {
+      "type": "Badge",
+      "props": { "children": "{{option_a_name}}", "color": "green" },
+      "children": []
+    },
+    "legend-b": {
+      "type": "Badge",
+      "props": { "children": "{{option_b_name}}", "color": "yellow" },
+      "children": []
+    }
+  }
+}

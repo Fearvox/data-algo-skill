@@ -1,0 +1,91 @@
+{
+  "_comment": "Template: Before/After Optimization Diff. Replace {{placeholders}} with real data.",
+  "root": "container",
+  "elements": {
+    "container": {
+      "type": "Box",
+      "props": { "flexDirection": "column", "padding": 1 },
+      "children": ["title", "divider1", "summary", "divider2", "scale-section", "divider3", "files-section", "profile-section"]
+    },
+    "title": {
+      "type": "Heading",
+      "props": { "text": "✅ Optimization Shipped", "level": "h1" },
+      "children": []
+    },
+    "divider1": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+    },
+    "summary": {
+      "type": "Box",
+      "props": { "flexDirection": "column", "gap": 1 },
+      "children": ["complexity-before", "arrow", "complexity-after"]
+    },
+    "complexity-before": {
+      "type": "KeyValue",
+      "props": { "label": "Before", "value": "{{old_time}} time / {{old_space}} space" },
+      "children": []
+    },
+    "arrow": {
+      "type": "Text",
+      "props": { "color": "green", "bold": true, "children": "  ↓" },
+      "children": []
+    },
+    "complexity-after": {
+      "type": "KeyValue",
+      "props": { "label": "After", "value": "{{new_time}} time / {{new_space}} space" },
+      "children": []
+    },
+    "divider2": {
+      "type": "Divider",
+      "props": { "title": "At n = {{input_size}}" },
+      "children": []
+    },
+    "scale-section": {
+      "type": "Box",
+      "props": { "flexDirection": "column" },
+      "children": ["ops-before", "ops-after", "speedup"]
+    },
+    "ops-before": {
+      "type": "BarChart",
+      "props": {
+        "data": [
+          { "label": "Before", "value": "{{old_ops}}" },
+          { "label": "After", "value": "{{new_ops}}" }
+        ]
+      },
+      "children": []
+    },
+    "ops-after": {
+      "type": "Text",
+      "props": { "dimColor": true, "children": "  Before: {{old_ops_formatted}} ops → After: {{new_ops_formatted}} ops" },
+      "children": []
+    },
+    "speedup": {
+      "type": "Box",
+      "props": { "marginTop": 1 },
+      "children": ["speedup-badge"]
+    },
+    "speedup-badge": {
+      "type": "Badge",
+      "props": { "children": "~{{speedup_factor}}x faster", "color": "green" },
+      "children": []
+    },
+    "divider3": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+    },
+    "files-section": {
+      "type": "KeyValue",
+      "props": { "label": "Files Changed", "value": "{{files_changed}}" },
+      "children": []
+    },
+    "profile-section": {
+      "type": "KeyValue",
+      "props": { "label": "Profile Card", "value": "{{profile_path}}" },
+      "children": []
+    }
+  }
+}

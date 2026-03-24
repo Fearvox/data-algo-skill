@@ -1,0 +1,120 @@
+{
+  "_comment": "Template: Benchmark Results Dashboard. Reads from benchmark.json.",
+  "root": "container",
+  "elements": {
+    "container": {
+      "type": "Box",
+      "props": { "flexDirection": "column", "padding": 1 },
+      "children": ["title", "divider1", "summary-section", "divider2", "evals-section", "divider3", "notes"]
+    },
+    "title": {
+      "type": "Heading",
+      "props": { "text": "Benchmark — {{skill_name}}", "level": "h1" },
+      "children": []
+    },
+    "divider1": {
+      "type": "Divider",
+      "props": { "title": "Overall" },
+      "children": []
+    },
+    "summary-section": {
+      "type": "Box",
+      "props": { "flexDirection": "column", "gap": 1 },
+      "children": ["pass-rate-with", "pass-rate-without", "delta"]
+    },
+    "pass-rate-with": {
+      "type": "Box",
+      "props": { "gap": 1 },
+      "children": ["pass-rate-with-label", "pass-rate-with-bar"]
+    },
+    "pass-rate-with-label": {
+      "type": "Text",
+      "props": { "bold": true, "children": "With Skill:   " },
+      "children": []
+    },
+    "pass-rate-with-bar": {
+      "type": "ProgressBar",
+      "props": { "value": "{{with_skill_pass_rate}}" },
+      "children": []
+    },
+    "pass-rate-without": {
+      "type": "Box",
+      "props": { "gap": 1 },
+      "children": ["pass-rate-without-label", "pass-rate-without-bar"]
+    },
+    "pass-rate-without-label": {
+      "type": "Text",
+      "props": { "children": "Without Skill:" },
+      "children": []
+    },
+    "pass-rate-without-bar": {
+      "type": "ProgressBar",
+      "props": { "value": "{{without_skill_pass_rate}}" },
+      "children": []
+    },
+    "delta": {
+      "type": "Badge",
+      "props": { "children": "Delta: {{delta_pass_rate}}", "color": "green" },
+      "children": []
+    },
+    "divider2": {
+      "type": "Divider",
+      "props": { "title": "Per Eval" },
+      "children": []
+    },
+    "evals-section": {
+      "type": "Table",
+      "props": {
+        "data": [
+          {
+            "Eval": "{{eval_0_name}}",
+            "With Skill": "{{eval_0_with_rate}}",
+            "Baseline": "{{eval_0_without_rate}}",
+            "Time (w/s)": "{{eval_0_with_time}}s / {{eval_0_without_time}}s",
+            "Tokens (w/s)": "{{eval_0_with_tokens}} / {{eval_0_without_tokens}}"
+          },
+          {
+            "Eval": "{{eval_1_name}}",
+            "With Skill": "{{eval_1_with_rate}}",
+            "Baseline": "{{eval_1_without_rate}}",
+            "Time (w/s)": "{{eval_1_with_time}}s / {{eval_1_without_time}}s",
+            "Tokens (w/s)": "{{eval_1_with_tokens}} / {{eval_1_without_tokens}}"
+          },
+          {
+            "Eval": "{{eval_2_name}}",
+            "With Skill": "{{eval_2_with_rate}}",
+            "Baseline": "{{eval_2_without_rate}}",
+            "Time (w/s)": "{{eval_2_with_time}}s / {{eval_2_without_time}}s",
+            "Tokens (w/s)": "{{eval_2_with_tokens}} / {{eval_2_without_tokens}}"
+          }
+        ]
+      },
+      "children": []
+    },
+    "divider3": {
+      "type": "Divider",
+      "props": { "title": "Analysis" },
+      "children": []
+    },
+    "notes": {
+      "type": "List",
+      "props": {},
+      "children": ["note-1", "note-2", "note-3"]
+    },
+    "note-1": {
+      "type": "ListItem",
+      "props": { "children": "{{note_1}}" },
+      "children": []
+    },
+    "note-2": {
+      "type": "ListItem",
+      "props": { "children": "{{note_2}}" },
+      "children": []
+    },
+    "note-3": {
+      "type": "ListItem",
+      "props": { "children": "{{note_3}}" },
+      "children": []
+    }
+  }
+}

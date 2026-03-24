@@ -1,0 +1,106 @@
+{
+  "skill_name": "data-algo",
+  "evals": [
+    {
+      "id": 0,
+      "name": "perf-optimization",
+      "prompt": "这个数据处理函数在抖音数据量到 5000 条时特别慢，帮我优化一下",
+      "expected_output": "Should diagnose O(n²) dedup + O(n²) bubble sort, recommend Hash Map + Array.sort, implement the fix, and create .algo-profile/ cards",
+      "files": ["evals/test-files/eval-0-slow-dedup.ts"],
+      "assertions": [
+        {
+          "id": "perf-0-diagnosis",
+          "text": "Correctly identifies the O(n²) nested loop dedup as the primary bottleneck",
+          "type": "qualitative"
+        },
+        {
+          "id": "perf-0-hashmap",
+          "text": "Uses Map/Object for O(1) dedup lookup instead of nested loop",
+          "type": "code_check"
+        },
+        {
+          "id": "perf-0-sort",
+          "text": "Replaces manual bubble sort with Array.sort() or equivalent O(n log n)",
+          "type": "code_check"
+        },
+        {
+          "id": "perf-0-profile",
+          "text": "Creates .algo-profile/ directory with at least one profile card",
+          "type": "file_check"
+        },
+        {
+          "id": "perf-0-recommendations",
+          "text": "Presents 2-3 ranked recommendations before implementing",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "cache-implementation",
+      "prompt": "wyz-report-web 的 collector 需要一个缓存机制，API 请求结果缓存 10 分钟，最多存 200 条",
+      "expected_output": "Should recommend LRU Cache with TTL, implement it, integrate into the existing fetchPlatformData flow, and create a profile card",
+      "files": ["evals/test-files/eval-1-collector-context.ts"],
+      "assertions": [
+        {
+          "id": "cache-1-structure",
+          "text": "Recommends or implements LRU Cache (or equivalent bounded cache with eviction)",
+          "type": "qualitative"
+        },
+        {
+          "id": "cache-1-ttl",
+          "text": "Implements TTL/expiration mechanism (10 minute timeout)",
+          "type": "code_check"
+        },
+        {
+          "id": "cache-1-capacity",
+          "text": "Implements capacity limit of 200 entries with eviction",
+          "type": "code_check"
+        },
+        {
+          "id": "cache-1-integration",
+          "text": "Integrates cache into existing fetchPlatformData or batchCollect flow",
+          "type": "code_check"
+        },
+        {
+          "id": "cache-1-profile",
+          "text": "Creates .algo-profile/ card for the cache implementation",
+          "type": "file_check"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "profile-reuse",
+      "prompt": "我需要在另一个模块也做频率统计，之前在 collector 里用过类似的",
+      "expected_output": "Should check .algo-profile/, find the existing hash-map-freq-counter card, reference it, and implement the frequency analysis using the same pattern",
+      "files": [
+        "evals/test-files/eval-2-existing-profile/freq-stats.ts",
+        "evals/test-files/eval-2-existing-profile/.algo-profile/README.md",
+        "evals/test-files/eval-2-existing-profile/.algo-profile/structures/hash-map-freq-counter.md"
+      ],
+      "assertions": [
+        {
+          "id": "reuse-2-check-profile",
+          "text": "Checks .algo-profile/ directory before recommending from scratch",
+          "type": "qualitative"
+        },
+        {
+          "id": "reuse-2-reference",
+          "text": "References the existing hash-map-freq-counter profile card",
+          "type": "qualitative"
+        },
+        {
+          "id": "reuse-2-implementation",
+          "text": "Implements analyzeSignalFrequency using Map-based frequency counting",
+          "type": "code_check"
+        },
+        {
+          "id": "reuse-2-complete",
+          "text": "All three return fields (byType, byPlatform, topSignals) are implemented",
+          "type": "code_check"
+        }
+      ]
+    }
+  ]
+}

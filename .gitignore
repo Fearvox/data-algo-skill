@@ -1,0 +1,6 @@
+node_modules/
+data-algo-workspace/
+evals/test-files/
+*.output
+.DS_Store
+package-lock.json

@@ -1,0 +1,14 @@
+{
+  "name": "data-algo-viz-renderer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Terminal renderer for data-algo skill visualizations",
+  "dependencies": {
+    "@json-render/core": "latest",
+    "@json-render/ink": "latest",
+    "ink": "^6.0.0",
+    "react": "^19.0.0",
+    "zod": "^3.23.0"
+  }
+}

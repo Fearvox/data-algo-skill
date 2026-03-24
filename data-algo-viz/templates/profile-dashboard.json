@@ -1,0 +1,78 @@
+{
+  "_comment": "Template: Algorithm Profile Dashboard. Replace {{placeholders}} with real data.",
+  "root": "container",
+  "elements": {
+    "container": {
+      "type": "Box",
+      "props": { "flexDirection": "column", "padding": 1 },
+      "children": ["title", "subtitle", "divider1", "table", "divider2", "categories", "divider3", "footer"]
+    },
+    "title": {
+      "type": "Heading",
+      "props": { "text": "Algorithm Profile — {{project_name}}", "level": "h1" },
+      "children": []
+    },
+    "subtitle": {
+      "type": "Text",
+      "props": { "dimColor": true, "children": "{{total_count}} algorithms profiled · Last updated {{last_date}}" },
+      "children": []
+    },
+    "divider1": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+    },
+    "table": {
+      "type": "Table",
+      "props": {
+        "data": [
+          {
+            "Algorithm": "{{algo_1_name}}",
+            "Time": "{{algo_1_time}}",
+            "Space": "{{algo_1_space}}",
+            "Used In": "{{algo_1_file}}",
+            "Date": "{{algo_1_date}}"
+          },
+          {
+            "Algorithm": "{{algo_2_name}}",
+            "Time": "{{algo_2_time}}",
+            "Space": "{{algo_2_space}}",
+            "Used In": "{{algo_2_file}}",
+            "Date": "{{algo_2_date}}"
+          }
+        ]
+      },
+      "children": []
+    },
+    "divider2": {
+      "type": "Divider",
+      "props": { "title": "Categories" },
+      "children": []
+    },
+    "categories": {
+      "type": "BarChart",
+      "props": {
+        "data": [
+          { "label": "structures", "value": "{{cat_structures}}" },
+          { "label": "sorting", "value": "{{cat_sorting}}" },
+          { "label": "search", "value": "{{cat_search}}" },
+          { "label": "optimization", "value": "{{cat_optimization}}" },
+          { "label": "string", "value": "{{cat_string}}" },
+          { "label": "math", "value": "{{cat_math}}" },
+          { "label": "graph", "value": "{{cat_graph}}" }
+        ]
+      },
+      "children": []
+    },
+    "divider3": {
+      "type": "Divider",
+      "props": {},
+      "children": []
+    },
+    "footer": {
+      "type": "Text",
+      "props": { "dimColor": true, "children": "Source: .algo-profile/ · Rendered by data-algo-viz" },
+      "children": []
+    }
+  }
+}
