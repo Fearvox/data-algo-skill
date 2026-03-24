@@ -118,15 +118,87 @@ Implement the chosen algorithm directly in the codebase:
 2. **Integrate it** — replace or refactor the current code to use the new approach
 3. **Add inline comments only where the algorithm choice isn't obvious** — e.g., "Using Fenwick tree for O(log n) prefix sums" is useful; "// loop through array" is not
 4. **Run build/tests** if available (`npm run build`, `npm test`, etc.)
+5. **Create profile cards** in `.algo-profile/` for each non-trivial algorithm applied
+6. **Generate the visual report** (see below)
 
-After shipping, report:
+### Phase 5: Visual Report
+
+After shipping, present results as a **three-panel visual report**. This is the primary output the user sees — lead with the visual, then the detailed report.
+
+If `data-algo-viz` is available (scripts installed), render via `node render.mjs`. Otherwise, use the text format below — it renders well in any terminal.
+
+#### Panel 1 — Hero 优化 (the single biggest win)
+
+Show the most impactful optimization as a before/after with bar chart:
+
+```
+Panel 1 — Hero 优化 ([ID])
+Before: [old approach]        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  [old_ops] ops
+After:  [new approach]        ▊                   [new_ops] ops
+⚡ ~[speedup]x speedup
+```
+
+Compute operation counts using `references/big-o.md` formulas at the actual input size. The bar widths should be proportional to the operation counts — make the contrast visceral.
+
+#### Panel 2 — 影响力排名 (all optimizations ranked by eliminated operations)
+
+List ALL optimizations found (not just the one implemented), ranked by the number of operations eliminated. Use short IDs (H1, M1, etc. for High/Medium priority):
+
+```
+Panel 2 — 影响力排名（按消除的操作数）
+H1 [description] ×[old]→×[new]      ▓▓▓▓▓▓▓▓▓▓▓▓  [eliminated] ops
+H2 [description] ×[old]→×[new]      ▓▓▓▓▓▓         [eliminated] ops
+M1 [description]                     ▓▓▓            [eliminated] ops
+M2 [description]                     ▓              [eliminated] ops
+L1-L3 (smaller wins)                                <[threshold] each
+```
+
+This panel answers: "Where did the biggest wins come from, and what's left on the table?"
+
+#### Panel 3 — 算法存档 (profile cards created)
+
+Compact table of all algorithms profiled in this session:
+
+```
+Panel 3 — 算法存档
+[ID]  [Algorithm Name]      [Time]       [Space]    [File]
+M3    Sparse Sliding Window  O(P)         O(W·k)     persona.ts
+H3    Pre-computed Lookup    O(P)+O(1)    O(T)       content-planner.ts
+M1    Binary Search          O(log n)     O(1)       benchmark.ts
++ [N] elimination optimizations ([IDs])
+```
+
+#### When to use which panels
+
+- **Single optimization** (Express mode): Panel 1 + Panel 3 only. Skip Panel 2.
+- **Multiple optimizations** (Standard mode or Knowledge Import): All 3 panels.
+- **Knowledge Import scan**: Panel 2 (as opportunities, not completed) + Panel 3 (existing profiled algorithms).
+
+#### Generating the viz spec
+
+If `data-algo-viz` is installed, generate a JSON spec for `render.mjs` that combines all three panels into a single terminal render. Use these components:
+
+- Panel 1: `BarChart` (2 bars: before/after) + `Badge` (speedup) + `KeyValue` (before/after labels)
+- Panel 2: `BarChart` (all optimizations ranked) + `Text` (IDs and descriptions)
+- Panel 3: `Table` (columns: ID, Algorithm, Time, Space, File)
+
+Wrap all panels in a `Box` with `flexDirection: "column"` and `Divider` separators titled "Panel 1 — Hero 优化", "Panel 2 — 影响力排名", "Panel 3 — 算法存档".
+
+#### Fallback (no viz installed)
+
+If the render script is not available, output the three panels as formatted text in the conversation. The text format above IS the fallback — it's designed to be readable in any monospace terminal.
+
+#### After the visual report
+
+Follow the panels with the detailed optimization report:
 
 ```
 ## Shipped
 - Replaced: [old approach] → [new approach]
 - Files changed: [list]
 - Complexity: O(old) → O(new)
-- Next: [any follow-up suggestions, or "done"]
+- Profile cards: [list of .algo-profile/ files created]
+- Next: [follow-up suggestions, or "done"]
 ```
 
 ## Profile Directory — Algorithm Snapshot System
