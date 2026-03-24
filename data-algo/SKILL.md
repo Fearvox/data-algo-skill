@@ -23,11 +23,18 @@ The user (Nolan) operates in "full throttle" mode: minimal questions, maximum ac
 
 This skill is backed by a curated index of ~100 data structures and algorithms derived from [javascript-algorithms](https://github.com/trekhleb/javascript-algorithms). The full catalog lives in `references/`:
 
-- `references/data-structures.md` — All data structures with when-to-use decision guidance
-- `references/algorithms.md` — All algorithms organized by domain (math, string, graph, sorting, search, etc.)
+- `references/data-structures.md` — 15 data structures with when-to-use decision guidance
+- `references/algorithms.md` — ~70 algorithms organized by domain (math, string, graph, sorting, search, etc.)
 - `references/paradigms.md` — Algorithm design paradigms (DP, greedy, divide-and-conquer, backtracking) with problem-pattern recognition
+- `references/big-o.md` — Big-O growth tables, data structure operation complexity, sorting comparison, graph/string algorithm complexity, and computation helpers for viz
+- `references/glossary-zh.md` — Chinese-English algorithm terminology mapping + colloquial expression → algorithm lookup table
 
-Read the relevant reference file when you need to select or compare approaches. You don't need to load all three for every invocation — pick the one(s) that match the problem domain.
+Read the relevant reference file when you need to select or compare approaches. You don't need to load all five for every invocation — pick the one(s) that match:
+- **Choosing a data structure** → `data-structures.md`
+- **Selecting an algorithm** → `algorithms.md`
+- **Recognizing a pattern** → `paradigms.md`
+- **Comparing complexities** → `big-o.md`
+- **User speaks Chinese** → `glossary-zh.md` to map terms, then the relevant domain file
 
 ## Adaptive Mode
 
@@ -208,3 +215,63 @@ After creating or updating a profile card, regenerate `.algo-profile/README.md`:
 - **Language mismatch**: The knowledge base is JavaScript-centric but the patterns are universal. Adapt implementations to whatever language the project uses.
 - **Existing `.algo-profile/`**: Always check it first. If the same pattern was used before in this project, reference the existing card instead of starting from scratch.
 - **Incremental optimization**: When revisiting code that already has a profile card, read the card first to understand what was already tried and why. Optimize from the current state, don't start from zero. The profile is the project's algorithmic history — respect it.
+
+## Knowledge Import — Bootstrapping a Project's Profile
+
+When a user says "scan this project for algorithm opportunities" or "build my algo profile", run the import process:
+
+### Step 1: Scan
+
+Search the project's source files for algorithmic patterns:
+
+```
+Grep for: Map\(|new Set\(|\.sort\(|\.filter\(|\.reduce\(|for.*for|while.*while|indexOf|includes.*loop|cache|queue|stack|heap|tree|graph|bfs|dfs|priority
+```
+
+Also look for:
+- Nested loops (O(n^2) or worse)
+- Manual sorting (comparison swaps without `.sort()`)
+- Linear scans where hash lookups would work
+- Repeated computations that could be memoized
+- Data processing pipelines with multiple passes
+
+### Step 2: Classify
+
+For each finding, classify it:
+
+| Pattern Found | Category | Action |
+|--------------|----------|--------|
+| `new Map()` for lookup | structures | Profile as Hash Map — already optimized |
+| Nested `for` loops | optimization | Flag as potential O(n^2) bottleneck |
+| `.sort()` on large arrays | sorting | Profile the sort strategy |
+| Manual cache with expiry | structures | Profile as TTL Cache |
+| BFS/DFS traversal | graph | Profile the traversal pattern |
+| Sliding window pattern | optimization | Profile the window strategy |
+| No issues found | — | Report "codebase is clean" |
+
+### Step 3: Generate Profile
+
+For each classified algorithm, create a profile card in `.algo-profile/` following the standard format. Include:
+- What the code does now
+- Its current complexity
+- Whether it's optimal or has room for improvement
+- Relationship to other profiled algorithms in the project
+
+### Step 4: Report
+
+Present a summary to the user:
+
+```
+## Algorithm Profile — [Project Name]
+
+### Profiled (X algorithms)
+- [list of profiled algorithms with complexity and location]
+
+### Opportunities (Y potential improvements)
+- [list of bottlenecks found with estimated impact]
+
+### Clean (Z patterns already optimal)
+- [list of well-implemented patterns]
+```
+
+This gives the user a complete picture of the project's algorithmic health and a prioritized list of where to optimize next.

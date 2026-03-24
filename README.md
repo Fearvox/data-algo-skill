@@ -141,6 +141,31 @@ Quick selection matrix + 15 detailed entries: Linked List, Queue, Stack, Hash Ta
 ### `references/paradigms.md`
 Decision flowchart for: Brute Force, Greedy, Divide and Conquer, Dynamic Programming, Backtracking. Plus common patterns: Two Pointers, Sliding Window, Monotonic Stack, Prefix Sums, Binary Search on Answer, Topological Sort, Union-Find.
 
+### `references/big-o.md`
+Complete complexity reference tables: growth rates at different n, data structure operations, sorting algorithm comparison (with stability/space), graph algorithm complexity, string algorithm complexity, and computation helper functions for viz charts.
+
+### `references/glossary-zh.md`
+Chinese-English bilingual algorithm glossary. Maps 60+ Chinese terms to their English equivalents with reference file pointers. Includes a "colloquial expression → algorithm" lookup table for natural language triggers like "太慢了" → complexity analysis, "去重" → Hash Set dedup, "找最大K个" → Heap/Quick Select.
+
+---
+
+## Knowledge Import
+
+Bootstrap a project's algorithm profile by scanning the existing codebase:
+
+```
+> "scan this project for algorithm opportunities"
+> "build my algo profile"
+```
+
+The skill will:
+1. **Scan** — grep for algorithmic patterns (Map, Set, sort, nested loops, cache, queue, etc.)
+2. **Classify** — categorize each finding as optimized, bottleneck, or opportunity
+3. **Profile** — create `.algo-profile/` cards for existing algorithms
+4. **Report** — present a health summary with prioritized optimization targets
+
+This gives you a complete algorithmic map of any project in one command — no manual profiling needed.
+
 ---
 
 ## Benchmark Results
@@ -172,7 +197,9 @@ data-algo-skill/
 │   └── references/
 │       ├── data-structures.md    # 15 data structures with decision guide
 │       ├── algorithms.md         # ~70 algorithms by domain
-│       └── paradigms.md          # Algorithm design paradigms + patterns
+│       ├── paradigms.md          # Algorithm design paradigms + patterns
+│       ├── big-o.md              # Complexity tables + computation helpers
+│       └── glossary-zh.md        # Chinese-English algorithm glossary
 │
 ├── data-algo-viz/                # Visualization companion
 │   ├── SKILL.md                  # Viz skill definition
