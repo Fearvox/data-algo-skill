@@ -11,17 +11,23 @@ Use this reference when you need to select or implement an algorithm. Organized 
 3. [Graphs](#graphs)
 4. [Strings](#strings)
 5. [Math](#math)
-6. [Sets & Combinatorics](#sets--combinatorics)
-7. [Dynamic Programming Problems](#dynamic-programming-problems)
-8. [Backtracking Problems](#backtracking-problems)
-9. [Machine Learning](#machine-learning)
-10. [Cryptography](#cryptography)
-11. [Hashing](#hashing)
-12. [Compression & Encoding](#compression--encoding)
-13. [Streaming & Probabilistic](#streaming--probabilistic)
-14. [Geometry & Navigation](#geometry--navigation)
-15. [Cellular Automata](#cellular-automata)
-16. [Other Classic Problems](#other-classic-problems)
+6. [Numerical Methods](#numerical-methods)
+7. [Sets & Combinatorics](#sets--combinatorics)
+8. [Dynamic Programming Problems](#dynamic-programming-problems)
+9. [Backtracking Problems](#backtracking-problems)
+10. [Machine Learning](#machine-learning)
+11. [Cryptography](#cryptography)
+12. [Hashing](#hashing)
+13. [Compression & Encoding](#compression--encoding)
+14. [Streaming & Probabilistic](#streaming--probabilistic)
+15. [Geometry & Navigation](#geometry--navigation)
+16. [Range Queries](#range-queries)
+17. [Bit Manipulation (Advanced)](#bit-manipulation-advanced)
+18. [Probability & Statistics](#probability--statistics)
+19. [Physics Simulations](#physics-simulations)
+20. [CPU Scheduling](#cpu-scheduling)
+21. [Cellular Automata](#cellular-automata)
+22. [Other Classic Problems](#other-classic-problems)
 
 ---
 
@@ -100,6 +106,20 @@ Use this reference when you need to select or implement an algorithm. Organized 
 **Dutch National Flag Sort** `B` — O(n) time, O(1) space. Three-way partitioning for arrays with three distinct values. Foundation of three-way quicksort (handles many duplicates). Classic interview problem. Source: `TheAlgorithms/JavaScript/Sorts/DutchNationalFlagSort.js`
 
 **Wiggle Sort** `B` — O(n) time, O(1) space. Rearrange array so that a[0] <= a[1] >= a[2] <= a[3] >= ... Alternating peaks and valleys. Single pass with swaps. Source: `TheAlgorithms/JavaScript/Sorts/SimplifiedWiggleSort.js`
+
+**Bitonic Sort** `A` — O(n log² n) time, O(n log² n) comparisons, O(1) space. Sorting network based on bitonic sequences (first ascending then descending). Highly parallelizable — each stage is independent. Use for: GPU/SIMD parallel sorting, hardware sorting networks, FPGA implementations. Source: `TheAlgorithms/C-Plus-Plus/sorting/bitonic_sort.cpp`
+
+**Library Sort (Gapped Insertion Sort)** `B` — O(n log n) expected, O(n²) worst, O(n) space. Insertion sort with gaps left in the array for future insertions (like shelving library books with spaces). Reduces shifts compared to standard insertion sort. Source: `TheAlgorithms/C-Plus-Plus/sorting/library_sort.cpp`
+
+**Strand Sort** `B` — O(n²) worst, O(n) best (sorted), O(n) space. Extracts sorted sublists (strands) from input, then merges them. Natural sort: performs well on partially sorted data. Source: `TheAlgorithms/C-Plus-Plus/sorting/strand_sort.cpp`
+
+**Slow Sort** `B` — O(n^(log n / (2 + ε))) time. Multiply-and-surrender paradigm (opposite of divide and conquer). Recursively finds maximum, places it at end, recurses on rest. Deliberately inefficient — educational counterexample to efficient algorithm design. Source: `TheAlgorithms/C-Plus-Plus/sorting/slow_sort.cpp`
+
+**Wave Sort** `B` — O(n) time, O(1) space. Rearrange array so a[0] >= a[1] <= a[2] >= a[3] <= ... (wave pattern). Similar to wiggle sort but with descending peaks. Single pass comparing adjacent pairs. Source: `TheAlgorithms/C-Plus-Plus/sorting/wave_sort.cpp`
+
+**Merge Insertion Sort (Ford-Johnson)** `A` — O(n log n) time. Theoretically optimal comparison sort that minimizes comparisons. Combines merge sort and binary insertion. Approaches information-theoretic lower bound ⌈log₂(n!)⌉. Use for: when comparison cost dominates (e.g., human sorting). Source: `TheAlgorithms/C-Plus-Plus/sorting/merge_insertion_sort.cpp`
+
+**Count Inversions** `A` — O(n log n) using modified merge sort. Count pairs (i, j) where i < j but arr[i] > arr[j]. Measures how far array is from sorted. Use for: ranking similarity, array sortedness metric, competitive programming. Source: `TheAlgorithms/C-Plus-Plus/sorting/count_inversions.cpp`
 
 ---
 
@@ -201,6 +221,14 @@ Use this reference when you need to select or implement an algorithm. Organized 
 
 **Graph Density** `B` — O(1). Ratio of actual edges to maximum possible edges. density = 2|E| / (|V|(|V|-1)) for undirected. Use for: choosing between adjacency list vs matrix representation, analyzing network structure. Source: `TheAlgorithms/JavaScript/Graphs/Density.js`
 
+**Bidirectional Dijkstra** `A` — O((V + E) log V). Run Dijkstra simultaneously from source and target, stop when search frontiers meet. Up to 2x faster than standard Dijkstra for point-to-point queries. Use for: road network routing, social network distance, any point-to-point shortest path. Source: `TheAlgorithms/C-Plus-Plus/graph/bidirectional_dijkstra.cpp`
+
+**Hopcroft-Karp** `A` — O(E × √V). Maximum matching in bipartite graphs. Uses BFS to find augmenting paths layer by layer, then DFS to augment. Faster than Hungarian algorithm for sparse bipartite graphs. Use for: job assignment, resource allocation, network flow reduction. Source: `TheAlgorithms/C-Plus-Plus/graph/hopcroft_karp.cpp`
+
+**Boruvka's MST** `A` — O(E log V). Each iteration, every component adds its cheapest outgoing edge. Parallelizable — all components process independently. Use for: parallel/distributed MST computation, when edges are already sorted, geometric MST. Source: `TheAlgorithms/C-Plus-Plus/greedy_algorithms/boruvkas_minimum_spanning_tree.cpp`
+
+**Bridge Finding (Tarjan)** `A` — O(V + E). Find all bridge edges whose removal disconnects the graph. Extension of Tarjan's DFS with low-link values. Use for: network vulnerability analysis, identifying critical connections, biconnected components. Source: `TheAlgorithms/C-Plus-Plus/graph/bridge_finding_with_tarjan_algorithm.cpp`
+
 ---
 
 ## Strings
@@ -251,6 +279,12 @@ Use this reference when you need to select or implement an algorithm. Organized 
 **Check Pangram** `B` — O(n). Determine if a string contains every letter of the alphabet at least once. Use a set or boolean array. Source: `TheAlgorithms/JavaScript/String/CheckPangram.js`
 
 **Longest Substring Without Repeating Characters** `B` — O(n). Sliding window with hash set. Track window of unique characters, expand right, shrink left when duplicate found. Classic interview problem. Source: `TheAlgorithms/JavaScript/Dynamic-Programming/Sliding-Window/LongestSubstringWithoutRepeatingCharacters.js`
+
+**Manacher's Algorithm** `A` — O(n). Find longest palindromic substring in linear time. Exploits symmetry: reuses previously computed palindrome radii to avoid redundant work. Transform string with separators to handle even-length palindromes uniformly. Use for: palindrome detection, DNA sequence analysis, competitive programming. Source: `TheAlgorithms/C-Plus-Plus/strings/manacher_algorithm.cpp`
+
+**Horspool Algorithm** `A` — O(n/m) best, O(n × m) worst. Simplified Boyer-Moore using only the bad character rule. Preprocessing builds shift table from last occurrence of each character in pattern. Simpler to implement than full Boyer-Moore with competitive practical performance. Use for: text editors, simple string search where implementation simplicity matters. Source: `TheAlgorithms/C-Plus-Plus/strings/horspool.cpp`
+
+**Duval Algorithm (Lyndon Factorization)** `A` — O(n) time, O(1) space. Decompose string into non-increasing sequence of Lyndon words (primitive strings that are lexicographically smaller than all their rotations). Use for: computing lexicographically smallest rotation, suffix array construction (Lyndon-based), string combinatorics. Source: `TheAlgorithms/C-Plus-Plus/strings/duval.cpp`
 
 ---
 
@@ -346,6 +380,75 @@ Use this reference when you need to select or implement an algorithm. Organized 
 
 **Figurate Numbers** `B` — O(1). Polygonal numbers (triangular, square, pentagonal, etc.). Formula: P(s,n) = n((s-2)n - (s-4))/2. Use for: number theory, combinatorics. Source: `TheAlgorithms/JavaScript/Maths/FigurateNumber.js`
 
+**Miller-Rabin Primality Test** `A` — O(k log² n). Probabilistic primality test stronger than Fermat's. Based on properties of strong pseudoprimes. No Carmichael number problem. Use for: cryptographic key generation, large prime verification, competitive programming. Source: `TheAlgorithms/C-Plus-Plus/math/miller_rabin.cpp`
+
+**N-Bonacci Numbers** `B` — O(n). Generalization of Fibonacci: each term is sum of previous n terms. F(n) = F(n-1) + F(n-2) + ... + F(n-k). Tribonacci (k=3), Tetranacci (k=4), etc. Use for: generalized recurrence analysis, combinatorial counting. Source: `TheAlgorithms/C-Plus-Plus/math/n_bonacci.cpp`
+
+**NCR Modulo P** `A` — O(n) preprocessing, O(1) per query. Compute C(n, r) mod p efficiently using precomputed factorials and modular inverse. Essential for combinatorics in modular arithmetic. Use for: competitive programming, cryptography, counting problems with large numbers. Source: `TheAlgorithms/C-Plus-Plus/math/ncr_modulo_p.cpp`
+
+**Quadratic Equation Solver** `B` — O(1). Solve ax² + bx + c = 0 including complex roots. Discriminant-based: real roots when D >= 0, complex when D < 0. Use for: physics, engineering calculations, geometric computations. Source: `TheAlgorithms/C-Plus-Plus/math/quadratic_equations_complex_numbers.cpp`
+
+**Linear Recurrence via Matrix Exponentiation** `A` — O(k³ log n) where k = order of recurrence. Compute nth term of any linear recurrence using matrix exponentiation. Generalization of Fibonacci matrix method. Use for: computing large terms in O(log n), competitive programming. Source: `TheAlgorithms/C-Plus-Plus/math/linear_recurrence_matrix.cpp`
+
+**Inverse Square Root (Fast)** `B` — O(1). Quake III's famous 0x5F3759DF magic number approximation. Uses bit-level floating point manipulation + one Newton iteration. Historical curiosity — modern hardware has fast rsqrt instructions. Source: `TheAlgorithms/C-Plus-Plus/math/inv_sqrt.cpp`
+
+---
+
+## Numerical Methods
+
+### Quick Selection Guide
+
+| Need | Algorithm | Complexity | Why |
+|------|-----------|-----------|-----|
+| Root of f(x) = 0, simple | Bisection Method | O(log((b-a)/ε)) | Guaranteed convergence |
+| Root of f(x) = 0, fast | Newton-Raphson | O(log n) iterations | Quadratic convergence |
+| Root, no derivative needed | False Position (Regula Falsi) | O(log((b-a)/ε)) | Faster than bisection usually |
+| Root, robust for tough functions | Brent's Method | superlinear | Combines bisection + secant |
+| All roots of polynomial | Durand-Kerner | varies | Finds all roots simultaneously |
+| Solve linear system Ax=b | Gaussian Elimination | O(n³) | Direct method |
+| Matrix factorization | LU Decomposition | O(n³) | Reuse for multiple right-hand sides |
+| Eigenvalues | QR Algorithm | O(n³) per iteration | Standard eigenvalue method |
+| Numerical integration | Simpson's Rule | O(n) | Parabolic approximation |
+| Solve ODE dy/dt = f(t,y) | Runge-Kutta (RK4) | O(n) | Fourth-order accuracy |
+| Minimize f(x) on interval | Golden Section Search | O(log((b-a)/ε)) | No derivatives needed |
+| Orthogonal basis | Gram-Schmidt | O(n²m) | QR factorization building block |
+
+### Detailed Entries
+
+**Newton-Raphson Method** `A` — O(log n) iterations with quadratic convergence. Root finding: x_{n+1} = x_n - f(x_n)/f'(x_n). Requires derivative. Converges very fast near root but can diverge with bad initial guess. Use for: solving nonlinear equations, optimization (finding where gradient = 0), numerical analysis. Avoid when: derivative is expensive/unavailable (use secant method), function has flat regions or multiple roots nearby. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/newton_raphson_method.cpp`
+
+**False Position (Regula Falsi)** `A` — O(log((b-a)/ε)). Root finding using linear interpolation between endpoints where f changes sign. Faster than bisection on average but can stall on one side. Use for: root finding when function is approximately linear near root. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/false_position.cpp`
+
+**Babylonian Method (Square Root)** `B` — O(log(1/ε)) iterations. Ancient algorithm equivalent to Newton's method applied to f(x) = x² - S. x_{n+1} = (x_n + S/x_n) / 2. Quadratic convergence. Use for: fast square root computation, hardware implementations. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/babylonian_method.cpp`
+
+**Successive Approximation (Fixed-Point Iteration)** `B` — O(log(1/ε)). Solve x = g(x) by iteration: x_{n+1} = g(x). Converges when |g'(x)| < 1 near fixed point. Simplest iterative method. Use for: solving implicit equations, simple iterative schemes. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/successive_approximation.cpp`
+
+**Brent's Method (Extrema)** `A` — Superlinear convergence. Combines inverse quadratic interpolation, secant method, and bisection. Robust root finder that adapts strategy based on convergence behavior. Use for: production-quality root finding, when robustness matters more than simplicity. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/brent_method_extrema.cpp`
+
+**Durand-Kerner Method** `A` — Finds ALL roots of a polynomial simultaneously. Iteratively refines n initial guesses for an nth-degree polynomial. Works for complex roots. Use for: finding all zeros of a polynomial, control systems, signal processing. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/durand_kerner_roots.cpp`
+
+**Golden Section Search** `A` — O(log((b-a)/ε)). Find minimum/maximum of unimodal function without derivatives. Divides interval using golden ratio φ = (1+√5)/2 for optimal convergence. Use for: optimization of expensive-to-evaluate functions, when derivatives are unavailable. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/golden_search_extrema.cpp`
+
+**Gaussian Elimination** `A` — O(n³). Solve systems of linear equations Ax = b by row reduction to row echelon form, then back-substitution. Can also compute determinant and matrix inverse. Use for: linear system solving, matrix rank computation, engineering simulations. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/gaussian_elimination.cpp`
+
+**LU Decomposition** `A` — O(n³) factorization, O(n²) per solve. Factor matrix A = LU (lower × upper triangular). Solve by forward + back substitution. Use for: solving Ax = b for multiple right-hand sides b efficiently, matrix inversion, determinant computation. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/lu_decompose.cpp`
+
+**QR Decomposition** `A` — O(n²m) where A is m×n. Factor A = QR where Q is orthogonal and R is upper triangular. Foundation for QR eigenvalue algorithm. Use for: least squares problems, eigenvalue computation, numerical stability. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/qr_decompose.cpp`
+
+**QR Eigenvalue Algorithm** `A` — O(n³) per iteration, typically O(n) iterations with shifts. Iteratively compute QR decomposition to converge to eigenvalues. The standard numerical method for eigenvalue problems. Use for: principal component analysis, vibration analysis, stability analysis. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/qr_eigenvalues.cpp`
+
+**Gram-Schmidt Orthogonalization** `A` — O(n²m). Transform a set of linearly independent vectors into an orthonormal basis. Foundation for QR decomposition. Use for: constructing orthogonal bases, numerical linear algebra, signal processing. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/gram_schmidt.cpp`
+
+**Composite Simpson's Rule** `B` — O(n). Numerical integration using parabolic approximation over subintervals: ∫f(x)dx ≈ (h/3)[f(x₀) + 4f(x₁) + 2f(x₂) + ... + f(xₙ)]. Fourth-order accuracy O(h⁴). More accurate than trapezoidal rule for same computational cost. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/composite_simpson_rule.cpp`
+
+**Runge-Kutta Method (RK4)** `A` — O(n). Fourth-order method for solving ordinary differential equations. Uses four slope evaluations per step: k1, k2, k3, k4 weighted average. Global error O(h⁴). Use for: physics simulations, population dynamics, circuit analysis, any ODE initial value problem. Superior to Euler method in accuracy. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/runge_kutta.cpp`
+
+**ODE Midpoint Euler** `B` — O(n). Second-order ODE solver. Evaluate slope at midpoint of interval: y_{n+1} = y_n + h·f(t_n + h/2, y_n + (h/2)·f(t_n, y_n)). Better accuracy than forward Euler with same step count. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/ode_midpoint_euler.cpp`
+
+**ODE Semi-Implicit Euler** `B` — O(n). Symplectic integrator for Hamiltonian systems. Updates velocity first, then uses new velocity for position. Conserves energy over long simulations. Use for: orbital mechanics, molecular dynamics, game physics where energy conservation matters. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/ode_semi_implicit_euler.cpp`
+
+**Inverse FFT** `A` — O(n log n). Inverse of Fast Fourier Transform: recover time-domain signal from frequency-domain representation. Same algorithm as FFT with conjugate and normalization. Use for: signal reconstruction, polynomial multiplication (complement to FFT), audio processing. Source: `TheAlgorithms/C-Plus-Plus/numerical_methods/inverse_fast_fourier_transform.cpp`
+
 ---
 
 ## Sets & Combinatorics
@@ -398,6 +501,12 @@ Use this reference when you need to select or implement an algorithm. Organized 
 
 **Tribonacci Number** `B` — O(n). T(n) = T(n-1) + T(n-2) + T(n-3), with T(0)=0, T(1)=T(2)=1. Generalization of Fibonacci to three terms. Source: `TheAlgorithms/JavaScript/Dynamic-Programming/TribonacciNumber.js`
 
+**Palindrome Partitioning (DP)** `A` — O(n²). Find minimum cuts to partition string into palindromes. Precompute palindrome table, then dp[i] = min cuts for substring 0..i. Use for: text processing, string decomposition, competitive programming. Source: `TheAlgorithms/C-Plus-Plus/dynamic_programming/palindrome_partitioning.cpp`
+
+**Maximum Circular Subarray** `A` — O(n). Maximum sum subarray that can wrap around circular array. max(Kadane's max, total_sum - Kadane's min). Edge case: all negative → use standard Kadane's. Use for: circular buffer analysis, ring-structured data. Source: `TheAlgorithms/C-Plus-Plus/dynamic_programming/maximum_circular_subarray.cpp`
+
+**Partition Problem** `A` — O(n × sum) DP. Determine if array can be partitioned into two subsets with equal sum. Variant of subset sum where target = total/2. Use for: balanced workload distribution, fair division problems. Source: `TheAlgorithms/C-Plus-Plus/dynamic_programming/partition_problem.cpp`
+
 ---
 
 ## Backtracking Problems
@@ -415,6 +524,12 @@ Use this reference when you need to select or implement an algorithm. Organized 
 **Flood Fill** `B` — O(m × n). Fill connected region of same color starting from a pixel. BFS or DFS. Use for: paint bucket tool, image segmentation, connected component labeling. Source: `TheAlgorithms/JavaScript/Recursive/FloodFill.js`
 
 **Letter Combinations of Phone Number** `A` — O(4^n). Generate all possible letter combinations from phone digit mapping. Backtracking/recursion. Classic interview problem. Source: `TheAlgorithms/JavaScript/Recursive/LetterCombination.js`
+
+**Minimax** `A` — O(b^d) where b = branching factor, d = depth. Game tree search algorithm for two-player zero-sum games. Maximizing player alternates with minimizing player. With alpha-beta pruning: O(b^(d/2)) best case. Use for: chess, tic-tac-toe, Connect Four, any adversarial game AI. Source: `TheAlgorithms/C-Plus-Plus/backtracking/minimax.cpp`
+
+**Graph Coloring** `A` — O(m^V). Assign m colors to graph vertices such that no adjacent vertices share the same color. NP-complete for m >= 3. Use for: register allocation in compilers, scheduling, map coloring, frequency assignment. Source: `TheAlgorithms/C-Plus-Plus/backtracking/graph_coloring.cpp`
+
+**Magic Sequence** `A` — Backtracking with constraint propagation. Find a sequence where each index i contains the count of how many times i appears in the sequence. Self-describing sequence. Use for: constraint satisfaction demonstrations, mathematical puzzles. Source: `TheAlgorithms/C-Plus-Plus/backtracking/magic_sequence.cpp`
 
 ---
 
@@ -484,6 +599,84 @@ Use this reference when you need to select or implement an algorithm. Organized 
 
 **Haversine Formula** `B` — O(1). Calculate great-circle distance between two latitude/longitude points on Earth. Accounts for spherical geometry. Use for: GPS applications, geofencing, nearest-location queries, delivery routing. Source: `TheAlgorithms/JavaScript/Navigation/Haversine.js`
 
+**Convex Hull (Jarvis March / Gift Wrapping)** `A` — O(n × h) where h = hull vertices. Start from leftmost point, repeatedly find the most counterclockwise point. Output-sensitive: faster than Graham Scan when hull has few vertices. Use for: convex hull when h << n, simple implementation, 3D extension is straightforward. Source: `TheAlgorithms/C-Plus-Plus/geometry/jarvis_algorithm.cpp`
+
+**Line Segment Intersection** `A` — O(1) per pair, O(n²) brute force for n segments. Determine if two line segments intersect using cross-product orientation tests. Handles collinear and endpoint cases. Use for: computational geometry, collision detection, geographic information systems, polygon clipping. Source: `TheAlgorithms/C-Plus-Plus/geometry/line_segment_intersection.cpp`
+
+**Smallest Enclosing Circle** `A` — O(n) expected (Welzl's algorithm). Find the smallest circle that encloses all given points. Randomized incremental algorithm with expected linear time. Use for: facility location, coverage problems, bounding volumes, wireless network coverage. Source: `TheAlgorithms/C-Plus-Plus/others/smallest_circle.cpp`
+
+---
+
+## Range Queries
+
+Specialized data structures and algorithms for efficient range-based operations on arrays.
+
+| Need | Approach | Query | Update | Space | Build |
+|------|----------|-------|--------|-------|-------|
+| Static range min/max/GCD | Sparse Table | O(1) | N/A (static) | O(n log n) | O(n log n) |
+| Range queries with updates | Segment Tree | O(log n) | O(log n) | O(n) | O(n) |
+| Offline range queries | Mo's Algorithm | O((n + q)√n) | N/A | O(n) | — |
+| Tree path queries | Heavy-Light Decomposition | O(log² n) | O(log² n) | O(n) | O(n) |
+| Persistent range queries | Persistent Segment Tree | O(log n) | O(log n) | O(n log n) | O(n log n) |
+
+**Sparse Table** `A` — O(n log n) build, O(1) query. Precompute answers for all power-of-2 ranges. For overlap-friendly functions (min, max, GCD), combine two overlapping ranges for O(1) query. Use for: static range minimum queries (RMQ), LCA reduction, competitive programming. Avoid when: array is updated frequently (use Segment Tree instead). Source: `TheAlgorithms/C-Plus-Plus/range_queries/sparse_table.cpp`
+
+**Mo's Algorithm** `A` — O((n + q)√n) where q = queries. Answer offline range queries by sorting queries by (block, right endpoint) and maintaining a current window. Extends range by adding/removing one element at a time. Use for: offline range frequency queries, count of distinct elements, any problem where adding/removing single elements is cheap. Avoid when: online answers required, or updates exist between queries. Source: `TheAlgorithms/C-Plus-Plus/range_queries/mo.cpp`
+
+**Heavy-Light Decomposition** `A` — O(n) build, O(log² n) per path query/update. Decompose tree into chains such that any root-to-leaf path crosses O(log n) chains. Combine with Segment Tree on chains for path queries. Use for: tree path sum/min/max queries with updates, tree path modification, LCA queries. Source: `TheAlgorithms/C-Plus-Plus/range_queries/heavy_light_decomposition.cpp`
+
+**Persistent Segment Tree** `A` — O(n log n) build, O(log n) per query/update, O(n log n) space. Create new version of tree for each update by copying only the O(log n) changed nodes. Access any historical version. Use for: range queries on historical versions, K-th smallest in range, version control for data structures. Source: `TheAlgorithms/C-Plus-Plus/range_queries/persistent_seg_tree_lazy_prop.cpp`
+
+---
+
+## Bit Manipulation (Advanced)
+
+Beyond basic set/get/clear/toggle operations.
+
+**Next Higher Number with Same Set Bits** `A` — O(1). Given a number, find the next larger number with the same number of 1-bits. Uses bit tricks: isolate rightmost set bit, compute carry, rearrange lowest bits. Use for: combinatorial enumeration in bit-order, Gosper's hack, competitive programming. Source: `TheAlgorithms/C-Plus-Plus/bit_manipulation/next_higher_number_with_same_number_of_set_bits.cpp`
+
+**Count Bits to Flip** `A` — O(k) where k = differing bits. Count minimum bit flips to convert integer A to integer B. XOR A and B, then count set bits in result (Brian Kernighan's method: n &= n-1). Use for: error correction, Hamming distance between integers, communication cost analysis. Source: `TheAlgorithms/C-Plus-Plus/bit_manipulation/count_bits_flip.cpp`
+
+**Travelling Salesman with Bitmask DP** `A` — O(2^n × n²). Solve TSP exactly using DP with bitmask to represent visited cities. dp[mask][i] = min cost to visit cities in mask ending at i. Practical for n <= 20. Use for: small TSP instances, routing optimization, Hamiltonian path problems. Source: `TheAlgorithms/C-Plus-Plus/bit_manipulation/travelling_salesman_using_bit_manipulation.cpp`
+
+**Find Non-Repeating Number** `B` — O(n) time, O(1) space. XOR all elements — paired elements cancel out, leaving the unique one. Extend to two non-repeating: partition by a differing bit. Use for: finding unique elements, detecting single changes, interview classic. Source: `TheAlgorithms/C-Plus-Plus/bit_manipulation/find_non_repeating_number.cpp`
+
+**Count Trailing Zeros in N!** `A` — O(log n). Count trailing zeros in factorial by counting factors of 5: Σ⌊n/5^i⌋. Each factor of 5 paired with abundant factor of 2 produces a trailing zero. Use for: number theory, competitive programming. Source: `TheAlgorithms/C-Plus-Plus/bit_manipulation/count_of_trailing_ciphers_in_factorial_n.cpp`
+
+---
+
+## Probability & Statistics
+
+**Bayes' Theorem** `B` — O(1). P(A|B) = P(B|A)·P(A)/P(B). Update belief about hypothesis A given new evidence B. Foundation of Bayesian inference. Use for: spam filtering, medical diagnosis, machine learning classifiers, A/B test analysis. Source: `TheAlgorithms/C-Plus-Plus/probability/bayes_theorem.cpp`
+
+**Binomial Distribution** `B` — O(k) per PMF evaluation. P(X=k) = C(n,k)·p^k·(1-p)^(n-k). Models number of successes in n independent trials with probability p. Use for: quality control, clinical trials, conversion rate analysis, A/B testing. Source: `TheAlgorithms/C-Plus-Plus/probability/binomial_dist.cpp`
+
+**Poisson Distribution** `B` — O(1) per PMF evaluation. P(X=k) = (λ^k · e^(-λ))/k!. Models number of events in fixed interval when events occur independently at constant rate λ. Use for: server request modeling, rare event analysis, queuing theory. Source: `TheAlgorithms/C-Plus-Plus/probability/poisson_dist.cpp`
+
+**Geometric Distribution** `B` — O(1). P(X=k) = (1-p)^(k-1)·p. Models number of trials until first success. Memoryless property. Use for: retry analysis, expected number of attempts, coupon collector variants. Source: `TheAlgorithms/C-Plus-Plus/probability/geometric_dist.cpp`
+
+**Exponential Distribution** `B` — O(1). f(x) = λe^(-λx). Continuous analog of geometric distribution. Models time between events in Poisson process. Memoryless. Use for: reliability engineering, queuing theory, radioactive decay. Source: `TheAlgorithms/C-Plus-Plus/probability/exponential_dist.cpp`
+
+**Windowed Median** `A` — O(n log k) where k = window size. Maintain running median over a sliding window using two heaps (max-heap for lower half, min-heap for upper half). Use for: signal smoothing, outlier detection, streaming statistics. Source: `TheAlgorithms/C-Plus-Plus/probability/windowed_median.cpp`
+
+**Addition Rule of Probability** `B` — O(1). P(A ∪ B) = P(A) + P(B) - P(A ∩ B). For mutually exclusive events: P(A ∪ B) = P(A) + P(B). Foundation for compound event probability. Source: `TheAlgorithms/C-Plus-Plus/probability/addition_rule.cpp`
+
+---
+
+## Physics Simulations
+
+**Ground-to-Ground Projectile Motion** `B` — O(1). Compute range, max height, and time of flight for projectile launched from ground level at angle θ with initial velocity v. Range = v²sin(2θ)/g, Max height = v²sin²(θ)/(2g), Time = 2v·sin(θ)/g. Use for: physics simulations, game ballistics, trajectory planning. Source: `TheAlgorithms/C-Plus-Plus/physics/ground_to_ground_projectile_motion.cpp`
+
+---
+
+## CPU Scheduling
+
+Algorithms used by operating systems to allocate CPU time to processes.
+
+**First Come First Served (FCFS)** `B` — O(n). Non-preemptive scheduling: processes executed in arrival order. Simple FIFO queue. Average waiting time can be high (convoy effect). Use for: batch systems, simple task queues, understanding scheduling fundamentals. Source: `TheAlgorithms/C-Plus-Plus/cpu_scheduling_algorithms/fcfs_scheduling.cpp`
+
+**Shortest Job First (SJF) — Non-Preemptive** `B` — O(n log n). Execute shortest process first from ready queue. Minimizes average waiting time (provably optimal among non-preemptive). Requires knowing burst times in advance. Risk of starvation for long processes. Use for: batch scheduling, job shop scheduling, understanding optimal scheduling theory. Source: `TheAlgorithms/C-Plus-Plus/cpu_scheduling_algorithms/non_preemptive_sjf_scheduling.cpp`
+
 ---
 
 ## Cellular Automata
@@ -541,3 +734,9 @@ Use this reference when you need to select or implement an algorithm. Organized 
 **Infix to Postfix Conversion** `B` — O(n) with stack. Convert infix expressions (a + b) to postfix (a b +) using Shunting Yard algorithm. Foundation for expression evaluation, compiler design. Ref: `keon/algorithms/stack/infix_to_postfix`
 
 **Josephus Problem** `A` — O(n) with recurrence: J(n,k) = (J(n-1,k) + k) mod n. Find last survivor when every k-th person is eliminated from a circle of n. Use for: mathematical puzzles, round-robin elimination. Ref: `keon/algorithms/array/josephus`
+
+**Floyd Cycle Detection** `B` — O(n) time, O(1) space. Tortoise-and-hare algorithm: slow pointer moves 1 step, fast pointer moves 2 steps. If cycle exists, they meet. Then reset one to start to find cycle entry point. Use for: linked list cycle detection, detecting infinite loops in sequences, finding duplicate in array. Source: `TheAlgorithms/C-Plus-Plus/search/floyd_cycle_detection_algo.cpp`
+
+**Morris Inorder Traversal** `A` — O(n) time, O(1) space. Traverse binary tree in-order without stack or recursion by using threaded binary tree technique (temporarily modifying tree structure). Use for: space-constrained tree traversal, competitive programming, embedded systems. Source: `TheAlgorithms/C-Plus-Plus/data_structures/morris_inorder_traversal.cpp`
+
+**Saddleback Search** `A` — O(m + n). Search for element in matrix where each row and column is sorted. Start from top-right (or bottom-left) corner, move left if too big, down if too small. Equivalent to Search in Sorted Matrix. Source: `TheAlgorithms/C-Plus-Plus/search/saddleback_search.cpp`

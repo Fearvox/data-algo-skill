@@ -28,6 +28,10 @@ Use this reference when the problem involves choosing or implementing a data str
 | Block-based range queries | Sqrt Decomposition | O(√n) query, simpler than Segment Tree |
 | Disk-optimized ordered data | B-Tree | O(log n), high branching, fewer disk reads |
 | Integer universe, predecessor/successor | van Emde Boas Tree | O(log log U) operations |
+| Probabilistic BST, no rotations | Treap | Random priorities maintain balance |
+| Balanced with 2-4 children | 2-3-4 Tree | Precursor to Red-Black Tree |
+| Fast search in sorted linked list | Skip List | O(log n) search with O(n) space |
+| Static range min/max/GCD queries | Sparse Table | O(1) query after O(n log n) build |
 
 ---
 
@@ -229,3 +233,35 @@ Use this reference when the problem involves choosing or implementing a data str
 - **Use when**: Integer keys from bounded universe; need extremely fast predecessor/successor queries; priority queue with integer keys; router IP lookup tables
 - **Avoid when**: Universe size U is very large (space prohibitive); keys are not integers; simpler structures (heap, BST) suffice
 - **Ref**: `keon/algorithms/data_structures/veb_tree`
+
+### Skip List `A`
+- **What**: Layered linked list with express lanes. Each level skips over elements, enabling binary-search-like performance on a linked structure
+- **Time**: Search O(log n) avg, Insert O(log n) avg, Delete O(log n) avg. Worst case O(n) but probabilistically rare
+- **Space**: O(n) expected
+- **Use when**: Need sorted dynamic set with simpler implementation than balanced BST; concurrent access (lock-free skip lists); Redis sorted sets; replacing balanced trees where simpler code matters
+- **Avoid when**: Guaranteed worst-case O(log n) needed (use AVL/Red-Black); memory overhead of pointers per level is concern
+- **Source**: `TheAlgorithms/C-Plus-Plus/data_structures/skip_list.cpp`
+
+### Treap (Tree + Heap) `A`
+- **What**: BST where each node has a key (BST property) and a random priority (heap property). Random priorities ensure expected O(log n) height without explicit rotations
+- **Time**: Search/Insert/Delete O(log n) expected
+- **Space**: O(n)
+- **Use when**: Need simple balanced BST implementation; randomized algorithms acceptable; split/merge operations needed (implicit treap); competitive programming
+- **Avoid when**: Deterministic worst-case guarantees needed; priority values cannot be random
+- **Source**: `TheAlgorithms/C-Plus-Plus/data_structures/treap.cpp`
+
+### 2-3-4 Tree `A`
+- **What**: Self-balancing search tree where nodes have 2, 3, or 4 children. All leaves at same depth. Isomorphic to Red-Black trees (direct correspondence between node types)
+- **Time**: Search/Insert/Delete O(log n) guaranteed
+- **Space**: O(n)
+- **Use when**: Understanding Red-Black tree theory; educational purposes; when direct multi-way branching is natural; precursor to B-trees (2-3-4 tree is B-tree of order 4)
+- **Avoid when**: Practical code — Red-Black tree is the standard implementation of this concept
+- **Source**: `TheAlgorithms/C-Plus-Plus/data_structures/tree_234.cpp`
+
+### Sparse Table `A`
+- **What**: Static data structure for range queries on idempotent functions (min, max, GCD). Precompute answers for all ranges of length 2^k
+- **Time**: Build O(n log n), Query O(1) for overlap-friendly operations (min/max/GCD), O(log n) for non-idempotent (sum)
+- **Space**: O(n log n)
+- **Use when**: Static arrays with many range min/max/GCD queries; LCA reduction to RMQ; competitive programming where O(1) query matters
+- **Avoid when**: Array is updated (use Segment Tree); need range sum (prefix sums are simpler for static); memory-constrained (uses O(n log n))
+- **Source**: `TheAlgorithms/C-Plus-Plus/data_structures/sparse_table.cpp`

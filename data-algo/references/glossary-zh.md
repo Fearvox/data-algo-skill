@@ -30,6 +30,10 @@
 | 分块 / 块状数组 | Sqrt Decomposition | structures | data-structures.md |
 | B 树 | B-Tree | structures | data-structures.md |
 | vEB 树 | van Emde Boas Tree | structures | data-structures.md |
+| 跳表 | Skip List | structures | data-structures.md |
+| 树堆 | Treap | structures | data-structures.md |
+| 2-3-4 树 | 2-3-4 Tree | structures | data-structures.md |
+| 稀疏表 | Sparse Table | structures | data-structures.md |
 
 ## 排序算法
 
@@ -47,6 +51,8 @@
 | 桶排序 | Bucket Sort | algorithms.md |
 | 鸡尾酒排序 | Cocktail Sort | algorithms.md |
 | 猴子排序 | Bogo Sort | algorithms.md |
+| 双调排序 | Bitonic Sort | algorithms.md |
+| 逆序对计数 | Count Inversions | algorithms.md |
 
 ## 图算法（补充）
 
@@ -160,6 +166,93 @@
 | 约瑟夫问题 | Josephus Problem | algorithms.md |
 | 螺旋矩阵遍历 | Spiral Matrix Traversal | algorithms.md |
 
+## 数值方法
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 牛顿迭代法 / 牛顿-拉弗森法 | Newton-Raphson Method | algorithms.md |
+| 试位法 / 假位法 | False Position (Regula Falsi) | algorithms.md |
+| 巴比伦法 | Babylonian Method | algorithms.md |
+| 逐次逼近法 | Successive Approximation | algorithms.md |
+| 布伦特法 | Brent's Method | algorithms.md |
+| 杜兰-科纳法 | Durand-Kerner Method | algorithms.md |
+| 黄金分割搜索 | Golden Section Search | algorithms.md |
+| 高斯消元法 | Gaussian Elimination | algorithms.md |
+| LU 分解 | LU Decomposition | algorithms.md |
+| QR 分解 | QR Decomposition | algorithms.md |
+| QR 特征值算法 | QR Eigenvalue Algorithm | algorithms.md |
+| 格拉姆-施密特正交化 | Gram-Schmidt Orthogonalization | algorithms.md |
+| 辛普森法则 | Simpson's Rule | algorithms.md |
+| 龙格-库塔法 | Runge-Kutta Method | algorithms.md |
+| 逆快速傅里叶变换 | Inverse FFT | algorithms.md |
+
+## 区间查询
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 稀疏表 | Sparse Table | algorithms.md |
+| 莫队算法 | Mo's Algorithm | algorithms.md |
+| 树链剖分 / 重链剖分 | Heavy-Light Decomposition | algorithms.md |
+| 可持久化线段树 / 主席树 | Persistent Segment Tree | algorithms.md |
+
+## 位运算（进阶）
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 同位数下一个更大数 | Next Higher Number with Same Set Bits | algorithms.md |
+| 翻转位数计数 | Count Bits to Flip | algorithms.md |
+| 状压 DP / 位掩码旅行商 | TSP with Bitmask DP | algorithms.md |
+| 阶乘尾零计数 | Count Trailing Zeros in N! | algorithms.md |
+
+## 概率与统计
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 贝叶斯定理 | Bayes' Theorem | algorithms.md |
+| 二项分布 | Binomial Distribution | algorithms.md |
+| 泊松分布 | Poisson Distribution | algorithms.md |
+| 几何分布 | Geometric Distribution | algorithms.md |
+| 指数分布 | Exponential Distribution | algorithms.md |
+| 滑动窗口中位数 | Windowed Median | algorithms.md |
+
+## CPU 调度
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 先来先服务 | FCFS (First Come First Served) | algorithms.md |
+| 最短作业优先 | SJF (Shortest Job First) | algorithms.md |
+
+## 几何算法（补充）
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 凸包 (Jarvis 步进法) | Convex Hull (Jarvis March) | algorithms.md |
+| 线段交叉检测 | Line Segment Intersection | algorithms.md |
+| 最小包围圆 | Smallest Enclosing Circle | algorithms.md |
+
+## 图算法（补充 — C++）
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 双向 Dijkstra | Bidirectional Dijkstra | algorithms.md |
+| Hopcroft-Karp 匹配 | Hopcroft-Karp | algorithms.md |
+| Boruvka 最小生成树 | Boruvka's MST | algorithms.md |
+
+## 字符串算法（补充）
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 马拉车算法 | Manacher's Algorithm | algorithms.md |
+| Horspool 算法 | Horspool Algorithm | algorithms.md |
+| Duval 算法 / Lyndon 分解 | Duval Algorithm (Lyndon Factorization) | algorithms.md |
+
+## 博弈与搜索
+
+| 中文 | English | Reference |
+|------|---------|-----------|
+| 极小化极大算法 | Minimax | algorithms.md |
+| 图着色 | Graph Coloring | algorithms.md |
+
 ## 算法范式
 
 | 中文 | English | Reference |
@@ -201,3 +294,16 @@
 | "空间搜索" / "最近邻" | KD Tree |
 | "匹配" / "配对" | Gale-Shapley (Stable Matching) |
 | "寻路" / "路径规划" | A* Search / Dijkstra |
+| "求根" / "解方程" | Newton-Raphson / Bisection / False Position |
+| "数值积分" / "求面积" | Simpson's Rule / Midpoint Integration |
+| "解微分方程" / "ODE" | Runge-Kutta / Euler Method |
+| "特征值" / "特征向量" | QR Algorithm |
+| "解线性方程组" | Gaussian Elimination / LU Decomposition |
+| "区间最小值" / "静态 RMQ" | Sparse Table |
+| "离线区间查询" | Mo's Algorithm |
+| "树上路径查询" | Heavy-Light Decomposition |
+| "博弈" / "对战 AI" | Minimax (alpha-beta pruning) |
+| "最大匹配" / "二部图匹配" | Hopcroft-Karp |
+| "回文串" / "最长回文" | Manacher's Algorithm |
+| "进程调度" / "CPU 调度" | FCFS / SJF |
+| "概率" / "分布" | Bayes / Binomial / Poisson |

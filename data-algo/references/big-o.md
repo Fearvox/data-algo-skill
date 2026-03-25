@@ -57,6 +57,9 @@ All complexities are **worst case** unless noted.
 | KD Tree | — | O(log n) avg | O(log n) | O(log n) | k-dimensional; O(n) worst |
 | Sqrt Decomposition | O(1) | O(√n) | O(1) | — | Block-based; simpler than Segment Tree |
 | van Emde Boas | — | O(log log U) | O(log log U) | O(log log U) | U = universe size; O(U) space |
+| Skip List | — | O(log n) avg | O(log n) avg | O(log n) avg | Probabilistic; O(n) worst |
+| Treap | O(log n) avg | O(log n) avg | O(log n) avg | O(log n) avg | Random priorities; O(n) worst |
+| Sparse Table | O(1) | O(1) min/max | — | — | Build O(n log n); static only |
 
 ---
 
@@ -77,6 +80,9 @@ All complexities are **worst case** unless noted.
 | Tim Sort | O(n) | O(n log n) | O(n log n) | O(n) | Yes | No | JS/Python default; hybrid |
 | Cocktail Sort | O(n) | O(n^2) | O(n^2) | O(1) | Yes | Yes | Bidirectional bubble sort |
 | Bogo Sort | O(n) | O((n+1)!) | O(∞) | O(1) | No | Yes | Random shuffle; joke only |
+| Bitonic Sort | O(n log² n) | O(n log² n) | O(n log² n) | O(1) | No | Yes | Sorting network; parallelizable |
+| Strand Sort | O(n) | O(n²) | O(n²) | O(n) | Yes | No | Extracts sorted strands |
+| Library Sort | O(n log n) | O(n log n) | O(n²) | O(n) | Yes | No | Gapped insertion sort |
 
 ---
 
@@ -99,6 +105,9 @@ All complexities are **worst case** unless noted.
 | Check Bipartite | O(V+E) | O(V) | 2-coloring graph test |
 | Transitive Closure | O(V^3) | O(V^2) | Reachability matrix |
 | Gale-Shapley | O(n^2) | O(n) | Stable matching |
+| Bidirectional Dijkstra | O((V+E) log V) | O(V) | Point-to-point shortest path |
+| Hopcroft-Karp | O(E√V) | O(V) | Max bipartite matching |
+| Boruvka | O(E log V) | O(V) | MST — parallelizable |
 
 ---
 
@@ -114,6 +123,9 @@ All complexities are **worst case** unless noted.
 | Wildcard Matching | O(n*m) | O(n*m) | Pattern with ? and * |
 | Min Window Substring | O(n) | O(k) | Smallest window with all chars |
 | Longest Common Prefix | O(S) | O(1) | Shared prefix, S = total chars |
+| Manacher | O(n) | O(n) | Longest palindromic substring |
+| Horspool | O(n/m) best, O(n*m) worst | O(k) | Simplified Boyer-Moore |
+| Duval (Lyndon) | O(n) | O(1) | Lyndon factorization |
 
 ---
 
