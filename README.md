@@ -11,6 +11,8 @@
   <a href="#usage">Usage</a> &nbsp;&middot;&nbsp;
   <a href="#knowledge-base">Knowledge Base</a> &nbsp;&middot;&nbsp;
   <a href="#data-algo-social">Social</a> &nbsp;&middot;&nbsp;
+  <a href="#data-algo-competitive">Competitive</a> &nbsp;&middot;&nbsp;
+  <a href="#data-algo-system">System Design</a> &nbsp;&middot;&nbsp;
   <a href="#data-algo-viz">Visualization</a> &nbsp;&middot;&nbsp;
   <a href="#benchmark-results">Benchmarks</a>
 </p>
@@ -109,25 +111,55 @@ The skill triggers automatically when you say things like:
 
 ## Knowledge Base
 
-Curated from three complementary repositories, organized into 11 reference files across two skill branches:
+Curated from 11 complementary sources, organized into 24 reference files across 5 skill branches:
 
-| Source | Focus | What we extracted |
-|--------|-------|-------------------|
-| [trekhleb/javascript-algorithms](https://github.com/trekhleb/javascript-algorithms) | Implementation-first — ~100 algorithms with JS code, tests, Big-O | Data structure selection matrices, algorithm domain index, paradigm flowcharts, complexity tables |
-| [labuladong/fucking-algorithm](https://github.com/labuladong/fucking-algorithm) | Thinking-first — 500+ problems with reusable mental frameworks (133k stars) | Problem-solving templates, pattern recognition heuristics, Chinese-native algorithm explanations, DP/backtracking/BFS decision trees |
-| [twitter/the-algorithm](https://github.com/twitter/the-algorithm) | Production-first — Twitter/X's open-source recommendation system | Signal collection patterns, two-stage ranking, SimClusters community detection, PageRank reputation, content filtering pipelines |
+| Source | Stars | Focus | What we extracted |
+|--------|-------|-------|-------------------|
+| [trekhleb/javascript-algorithms](https://github.com/trekhleb/javascript-algorithms) | 190K+ | Implementation-first — ~100 algorithms with JS code, tests, Big-O | Data structure selection matrices, algorithm domain index, paradigm flowcharts, complexity tables |
+| [labuladong/fucking-algorithm](https://github.com/labuladong/fucking-algorithm) | 133K+ | Thinking-first — 500+ problems with reusable mental frameworks | Problem-solving templates, pattern recognition heuristics, Chinese-native algorithm explanations, DP/backtracking/BFS decision trees |
+| [twitter/the-algorithm](https://github.com/twitter/the-algorithm) | 62K+ | Production-first — Twitter/X's open-source recommendation system | Signal collection patterns, two-stage ranking, SimClusters community detection, PageRank reputation, content filtering pipelines |
+| [keon/algorithms](https://github.com/keon/algorithms) | 25K+ | Python algorithm library — graph, number theory, compression | Graph algorithms, number theory, compression, streaming patterns |
+| [TheAlgorithms/JavaScript](https://github.com/TheAlgorithms/JavaScript) | 34K+ | Community algorithm collection — sorting, geometry, hashing | Sorting variants, geometry, cellular automata, hashing |
+| [TheAlgorithms/Python](https://github.com/TheAlgorithms/Python) | 219K+ | Broad algorithm coverage — geometry, compression, quantum | Geometry, compression, quantum computing, image processing algorithms |
+| [williamfiset/Algorithms](https://github.com/williamfiset/Algorithms) | 18K+ | Deep graph theory — network flow, advanced graph algorithms | Network flow implementations, advanced graph theory |
+| [cp-algorithms](https://cp-algorithms.com) | 10K+ | Competitive programming gold standard (e-maxx.ru translation) | Segment trees, FFT/NTT, string algorithms, number theory |
+| [OI-wiki](https://oi-wiki.org) | 26K+ | Chinese competitive programming wiki | Advanced data structures, competitive programming templates |
+| [ByteByteGoHq/system-design-101](https://github.com/ByteByteGoHq/system-design-101) | 81K+ | Visual system design patterns and concepts | Load balancing, caching, sharding, consensus patterns |
+| [karanpratapsingh/system-design](https://github.com/karanpratapsingh/system-design) | 42K+ | System design algorithm implementations | Rate limiting, data partitioning, probabilistic structures |
 
-Three complementary perspectives: `javascript-algorithms` gives us the **what** (implementations + complexity data), `labuladong` gives us the **how to think** (systematic frameworks for recognizing patterns), and `twitter/the-algorithm` gives us the **how it works at scale** (production-grade social platform patterns). Together they form a knowledge base spanning from theory to implementation to production.
+Multiple perspectives: `javascript-algorithms` + `keon` + `TheAlgorithms` give us the **what** (implementations + complexity data), `labuladong` gives us the **how to think** (systematic frameworks for recognizing patterns), `twitter/the-algorithm` gives us the **how it works at scale** (production-grade social platform patterns), `cp-algorithms` + `OI-wiki` give us **competitive depth** (advanced data structures and number theory), and `ByteByteGo` + `karanpratapsingh` give us **system design breadth** (distributed systems patterns). Together they form a knowledge base spanning from theory to implementation to production to competitive programming to system design.
 
 ### data-algo reference files
 
 | File | Contents |
 |------|----------|
-| `data-structures.md` | 15 data structures — quick selection matrix + detailed when-to-use / when-not-to-use for each |
-| `algorithms.md` | ~70 algorithms by domain: Sorting (10), Searching (4), Graphs (14), Strings (8), Math (16), Sets (11), ML (2), Crypto (4), Classic (11) |
+| `data-structures.md` | 32 data structures — quick selection matrix + detailed when-to-use / when-not-to-use for each (Linked List, BST, AVL, Segment Tree, Fenwick, Bloom Filter, KD Tree, Skip List, Treap, Suffix Array, Quadtree, etc.) |
+| `algorithms.md` | ~317 algorithms across 30 domains: Sorting (14), Searching (4), Graphs (14), Network Flow, Strings (8), Math (16), Numerical Methods, Linear Algebra, Sets (11), DP, Backtracking, ML, Crypto, Hashing, Compression, Streaming, Geometry, Range Queries, Bit Manipulation, Quantum Computing, and more |
 | `paradigms.md` | Decision flowchart for Brute Force, Greedy, D&C, DP, Backtracking + patterns: Two Pointers, Sliding Window, Monotonic Stack, Prefix Sums, Binary Search on Answer |
 | `big-o.md` | Growth rate tables, DS operation complexity, sorting comparison (stability/space), graph + string algo complexity, computation helpers for viz |
 | `glossary-zh.md` | 60+ Chinese-English term mappings + colloquial → algorithm lookup ("太慢了" → complexity analysis, "去重" → Hash Set, "找最大K个" → Heap) |
+
+### data-algo-competitive reference files
+
+| File | Contents |
+|------|----------|
+| `segment-trees.md` | Segment trees, Fenwick trees, sqrt decomposition, Mo's algorithm, persistent structures |
+| `string-algorithms.md` | Aho-Corasick, suffix automaton, Z-function, KMP, Manacher, palindromic tree |
+| `number-theory.md` | FFT/NTT, modular arithmetic, Euler's totient, CRT, Miller-Rabin, Pollard's rho |
+| `advanced-graphs.md` | Heavy-light decomposition, centroid decomposition, LCA, Euler tour, virtual tree |
+| `advanced-structures.md` | Li Chao tree, link-cut tree, persistent segment tree, wavelet tree |
+| `geometry.md` | Convex hull trick, half-plane intersection, Voronoi diagram, Minkowski sum |
+
+### data-algo-system reference files
+
+| File | Contents |
+|------|----------|
+| `load-balancing.md` | Consistent hashing, virtual nodes, weighted round-robin, least-connections |
+| `rate-limiting.md` | Token bucket, sliding window, leaky bucket, distributed rate limiting |
+| `caching-strategies.md` | Cache-aside, write-through, write-behind, LRU/LFU eviction, cache stampede prevention |
+| `data-partitioning.md` | Hash-based sharding, range partitioning, consistent hashing, rebalancing strategies |
+| `consensus-replication.md` | Raft, Paxos, leader election, log replication, split-brain prevention |
+| `probabilistic-structures.md` | Bloom filter, Count-Min Sketch, HyperLogLog, Skip List, cuckoo filter |
 
 ### data-algo-social reference files
 
@@ -186,6 +218,54 @@ Every reference file includes TypeScript implementations and three scale tiers (
 
 ---
 
+## data-algo-competitive
+
+Specialized branch for competitive programming and advanced algorithmic techniques. Covers segment trees, advanced string algorithms, number theory, computational geometry, and advanced data structures commonly seen in ICPC, Codeforces, and OI contests.
+
+| Your Problem | CP Pattern | Reference |
+|---|---|---|
+| Range query + point update | Fenwick Tree or Segment Tree | `segment-trees.md` |
+| Offline range queries | Sqrt Decomposition or Mo's Algorithm | `segment-trees.md` |
+| Multi-pattern string matching | Aho-Corasick automaton | `string-algorithms.md` |
+| Polynomial multiplication | FFT / NTT | `number-theory.md` |
+| Tree path queries | HLD or Centroid Decomposition | `advanced-graphs.md` |
+| DP optimization with convex function | Convex Hull Trick / Li Chao Tree | `geometry.md` / `advanced-structures.md` |
+
+#### Trigger keywords
+
+| Language | Keywords |
+|----------|----------|
+| English | `segment tree` · `fenwick` · `FFT` · `NTT` · `suffix automaton` · `centroid decomposition` · `HLD` · `convex hull trick` · `competitive programming` |
+| Chinese | `线段树` · `树状数组` · `快速傅里叶` · `后缀自动机` · `重链剖分` · `点分治` · `凸包` · `竞赛` |
+
+Reference files use C++ template format with complexity analysis, matching the standard competitive programming workflow.
+
+---
+
+## data-algo-system
+
+Specialized branch for system design algorithms and distributed systems patterns. Covers load balancing, rate limiting, caching strategies, data partitioning, consensus protocols, and probabilistic data structures used in production-scale systems.
+
+| Your Problem | System Design Pattern | Reference |
+|---|---|---|
+| Distribute load across servers | Consistent hashing with virtual nodes | `load-balancing.md` |
+| Prevent API abuse | Token bucket or sliding window | `rate-limiting.md` |
+| Speed up frequent reads | Cache-aside with LRU eviction | `caching-strategies.md` |
+| Scale database horizontally | Hash-based sharding | `data-partitioning.md` |
+| Coordinate distributed nodes | Raft consensus | `consensus-replication.md` |
+| Check set membership fast | Bloom filter | `probabilistic-structures.md` |
+
+#### Trigger keywords
+
+| Language | Keywords |
+|----------|----------|
+| English | `load balancer` · `rate limit` · `caching` · `sharding` · `consensus` · `replication` · `distributed` · `consistent hashing` · `bloom filter` |
+| Chinese | `负载均衡` · `限流` · `缓存策略` · `分片` · `一致性` · `副本` · `分布式` · `布隆过滤器` |
+
+Every reference file includes implementations and three scale tiers (Hobby / Growth / Scale) so patterns work whether you're designing for 1K or 1M requests per second.
+
+---
+
 ## data-algo-viz
 
 Companion skill that renders algorithm analysis as rich terminal UI using [`@json-render/ink`](https://github.com/vercel-labs/json-render).
@@ -241,14 +321,14 @@ Consistent across 2 iterations of testing.
 
 ```
 data-algo-skill/
-├── data-algo/                    # Main skill
-│   ├── SKILL.md                  # Skill definition + workflow
+├── data-algo/                       # Main skill
+│   ├── SKILL.md                     # Skill definition + workflow
 │   └── references/
-│       ├── data-structures.md    # 15 data structures with decision guide
-│       ├── algorithms.md         # ~70 algorithms by domain
-│       ├── paradigms.md          # Algorithm design paradigms + patterns
-│       ├── big-o.md              # Complexity tables + computation helpers
-│       └── glossary-zh.md        # Chinese-English algorithm glossary
+│       ├── data-structures.md       # 32 data structures with decision guide
+│       ├── algorithms.md            # ~317 algorithms across 30 domains
+│       ├── paradigms.md             # Algorithm design paradigms + patterns
+│       ├── big-o.md                 # Complexity tables + computation helpers
+│       └── glossary-zh.md           # Chinese-English algorithm glossary
 │
 ├── data-algo-social/                # Social platform branch
 │   ├── SKILL.md                     # Social-specific workflow + Twitter pattern mapping
@@ -259,6 +339,26 @@ data-algo-skill/
 │       ├── content-classification.md # Inverted index, embeddings, CJK tokenizer
 │       ├── graph-analysis.md        # PageRank, growth analysis, influence scoring
 │       └── trust-safety.md          # Content filtering, quality scoring, PII masking
+│
+├── data-algo-competitive/           # Competitive programming branch
+│   ├── SKILL.md                     # CP-specific workflow + contest patterns
+│   └── references/
+│       ├── segment-trees.md         # Segment trees, Fenwick, sqrt decomposition
+│       ├── string-algorithms.md     # Aho-Corasick, suffix automaton, Z-function
+│       ├── number-theory.md         # FFT/NTT, modular arithmetic, primality
+│       ├── advanced-graphs.md       # HLD, centroid decomposition, LCA, Euler tour
+│       ├── advanced-structures.md   # Li Chao tree, link-cut tree, wavelet tree
+│       └── geometry.md              # Convex hull trick, half-plane intersection
+│
+├── data-algo-system/                # System design branch
+│   ├── SKILL.md                     # System design workflow + scale tiers
+│   └── references/
+│       ├── load-balancing.md        # Consistent hashing, virtual nodes
+│       ├── rate-limiting.md         # Token bucket, sliding window, leaky bucket
+│       ├── caching-strategies.md    # Cache-aside, write-through, eviction policies
+│       ├── data-partitioning.md     # Sharding, range partitioning, rebalancing
+│       ├── consensus-replication.md # Raft, Paxos, leader election
+│       └── probabilistic-structures.md # Bloom filter, HyperLogLog, Count-Min Sketch
 │
 ├── data-algo-viz/                   # Visualization companion
 │   ├── SKILL.md                     # Viz skill definition
@@ -273,7 +373,6 @@ data-algo-skill/
 │   └── references/
 │       └── component-props.md       # ink component prop reference
 │
-├── .claude/commands/sync.md         # /sync command for update workflow
 ├── data-algo.skill                  # Packaged skill file
 ├── data-algo-viz.skill              # Packaged viz skill file
 └── README.md

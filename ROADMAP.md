@@ -6,30 +6,39 @@
 
 ---
 
-## Current State (v1.0)
+## Current State (v1.1)
 
-Three skill branches shipped and field-tested:
+Five skill branches shipped and field-tested:
 
 | Branch | References | Coverage |
 |--------|-----------|----------|
-| **data-algo** | 5 files | ~210 algorithms/data structures from 3 repos |
+| **data-algo** | 5 files | ~317 algorithms + 32 data structures from 5 repos |
 | **data-algo-social** | 6 files | Twitter/X recommendation patterns for social platforms |
+| **data-algo-competitive** | 6 files | Competitive programming: segment trees, FFT/NTT, advanced graphs, geometry |
+| **data-algo-system** | 6 files | System design: load balancing, caching, sharding, consensus, rate limiting |
 | **data-algo-viz** | 4 templates | Terminal visualization via @json-render/ink |
 
-Plus tooling: `/sync`, `/import-knowledge`, `.algo-profile/` snapshot system.
+24 reference files, 11 knowledge sources, ~400+ algorithms/patterns across all branches.
+
+Plus tooling: `/import-knowledge`, `.algo-profile/` snapshot system.
 
 ---
 
-## Near-Term (v1.1–v1.2)
+## Near-Term (v1.2)
 
 ### More Knowledge Sources
 
 | Source | Domain | Status |
 |--------|--------|--------|
-| [donnemartin/system-design-primer](https://github.com/donnemartin/system-design-primer) | System design patterns | Planned |
-| [yangshun/tech-interview-handbook](https://github.com/yangshun/tech-interview-handbook) | Interview algorithm patterns | Planned |
-| [jwasham/coding-interview-university](https://github.com/jwasham/coding-interview-university) | CS fundamentals curriculum | Planned |
+| [TheAlgorithms/Python](https://github.com/TheAlgorithms/Python) | Geometry, compression, quantum, image processing | ✅ Shipped |
+| [williamfiset/Algorithms](https://github.com/williamfiset/Algorithms) | Deep graph theory, network flow | ✅ Shipped |
+| [cp-algorithms.com](https://cp-algorithms.com) | Competitive programming reference | ✅ Shipped |
+| [OI-wiki](https://oi-wiki.org) | Chinese competitive programming wiki | ✅ Shipped |
+| [ByteByteGoHq/system-design-101](https://github.com/ByteByteGoHq/system-design-101) | Visual system design patterns | ✅ Shipped |
+| [karanpratapsingh/system-design](https://github.com/karanpratapsingh/system-design) | System design implementations | ✅ Shipped |
 | [Developer-Y/cs-video-courses](https://github.com/Developer-Y/cs-video-courses) | Academic CS lecture index | Exploring |
+
+> **Deviations from v1.0 plan:** The originally planned sources (donnemartin/system-design-primer, yangshun/tech-interview-handbook, jwasham/coding-interview-university) were replaced with higher-quality alternatives discovered via edge-knowledge research. The substituted sources (cp-algorithms, OI-wiki, ByteByteGo, williamfiset) provide deeper algorithmic content with less overlap.
 
 Use `/import-knowledge <url>` to add any of these — contributions welcome.
 
@@ -37,9 +46,9 @@ Use `/import-knowledge <url>` to add any of these — contributions welcome.
 
 | Branch | Purpose | Status |
 |--------|---------|--------|
+| **data-algo-competitive** | Competitive programming templates (segment trees, FFT/NTT, advanced graphs, geometry) | ✅ Shipped |
+| **data-algo-system** | System design patterns (load balancing, sharding, caching, consensus, rate limiting) | ✅ Shipped |
 | **data-algo-ml** | ML algorithm patterns (gradient descent, backprop, attention, transformers) | Planned |
-| **data-algo-system** | System design patterns (load balancing, sharding, caching layers, consensus) | Planned |
-| **data-algo-competitive** | Competitive programming templates (segment tree tricks, bit manipulation, number theory) | Exploring |
 
 ### Viz Upgrades
 
@@ -165,8 +174,14 @@ Knowledge sources that power this skill:
 | Source | Stars | Contribution |
 |--------|-------|-------------|
 | [trekhleb/javascript-algorithms](https://github.com/trekhleb/javascript-algorithms) | 190K+ | Core algorithm implementations + complexity data |
+| [TheAlgorithms/Python](https://github.com/TheAlgorithms/Python) | 219K+ | Geometry, compression, quantum, image processing algorithms |
 | [labuladong/fucking-algorithm](https://github.com/labuladong/fucking-algorithm) | 133K+ | Problem-solving mental frameworks |
+| [ByteByteGoHq/system-design-101](https://github.com/ByteByteGoHq/system-design-101) | 81K+ | Visual system design patterns and concepts |
 | [twitter/the-algorithm](https://github.com/twitter/the-algorithm) | 62K+ | Production social platform patterns |
-| [keon/algorithms](https://github.com/keon/algorithms) | 25K+ | Graph, number theory, compression, streaming |
+| [karanpratapsingh/system-design](https://github.com/karanpratapsingh/system-design) | 42K+ | System design algorithm implementations |
 | [TheAlgorithms/JavaScript](https://github.com/TheAlgorithms/JavaScript) | 34K+ | Sorting, geometry, cellular automata, hashing |
+| [OI-wiki](https://oi-wiki.org) | 26K+ | Chinese competitive programming knowledge base |
+| [keon/algorithms](https://github.com/keon/algorithms) | 25K+ | Graph, number theory, compression, streaming |
+| [williamfiset/Algorithms](https://github.com/williamfiset/Algorithms) | 18K+ | Deep graph theory, network flow implementations |
+| [cp-algorithms](https://cp-algorithms.com) | 10K+ | Competitive programming algorithm reference (e-maxx.ru translation) |
 | [vercel-labs/json-render](https://github.com/vercel-labs/json-render) | — | Terminal visualization engine |
