@@ -307,3 +307,47 @@
 | "回文串" / "最长回文" | Manacher's Algorithm |
 | "进程调度" / "CPU 调度" | FCFS / SJF |
 | "概率" / "分布" | Bayes / Binomial / Poisson |
+
+## 竞赛编程 (Competitive Programming)
+
+| 中文 | English | 口语 → 算法映射 |
+|------|---------|----------------|
+| 后缀数组 | Suffix Array | "字符串排序" → Suffix Array |
+| 后缀自动机 | Suffix Automaton | "子串计数" → Suffix Automaton |
+| AC自动机 | Aho-Corasick | "多模式匹配" → Aho-Corasick |
+| Z函数 | Z-function | "字符串匹配" → Z-function |
+| 快速傅里叶变换 / 数论变换 | FFT / NTT | "多项式乘法" → FFT |
+| 点分治 / 重心分解 | Centroid Decomposition | "树上路径查询" → Centroid Decomp |
+| 最近公共祖先 | LCA (Lowest Common Ancestor) | "树上两点距离" → LCA |
+| 可持久化数据结构 | Persistent Data Structure | "历史版本查询" → Persistent |
+| 凸包优化 | Convex Hull Trick | "斜率优化DP" → Convex Hull Trick |
+| 2-SAT | 2-SAT | "布尔可满足性" → 2-SAT |
+
+## 系统设计 (System Design)
+
+| 中文 | English | 口语 → 算法映射 |
+|------|---------|----------------|
+| 一致性哈希 | Consistent Hashing | "分布式缓存" → Consistent Hashing |
+| 限流 | Rate Limiting | "防刷" → Rate Limiting |
+| 令牌桶 | Token Bucket | "匀速限流" → Token Bucket |
+| 漏桶 | Leaky Bucket | "平滑流量" → Leaky Bucket |
+| 分片 | Sharding | "数据库拆分" → Sharding |
+| 共识算法 | Consensus Algorithm | "分布式一致" → Raft/Paxos |
+| 选主 | Leader Election | "谁来当主" → Leader Election |
+| 八卦协议 / 流言协议 | Gossip Protocol | "节点发现" → Gossip |
+| 基数估计 | HyperLogLog | "UV 统计" → HyperLogLog |
+| 无冲突复制数据类型 | CRDT | "多端同步" → CRDT |
+| 向量时钟 | Vector Clock | "因果序" → Vector Clock |
+| 旁路缓存 | Cache-Aside | "缓存未命中再查库" → Cache-Aside |
+| 直写缓存 | Write-Through | "同步写入" → Write-Through |
+
+## 进阶算法 (Advanced Algorithms)
+
+| 中文 | English | 口语 → 算法映射 |
+|------|---------|----------------|
+| 网络流 | Network Flow | "最大流" → Ford-Fulkerson/Dinic |
+| 最大流最小割 | Max-Flow Min-Cut | "最少删除断开" → Min Cut |
+| 二分图匹配 | Bipartite Matching | "任务分配" → Hungarian |
+| 计算几何 | Computational Geometry | "点线面" → Geometry |
+| 压缩算法 | Compression | "文件变小" → Huffman/LZ77 |
+| 斐波那契堆 | Fibonacci Heap | "最快的优先队列" → Fibonacci Heap |
