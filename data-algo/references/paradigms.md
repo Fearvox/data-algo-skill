@@ -272,3 +272,48 @@ These are recurring implementation patterns that cross paradigm boundaries:
 - **When**: Dynamic connectivity, "are these connected?", grouping
 - **How**: Disjoint Set with path compression + union by rank
 - **Complexity**: Near O(1) per operation (amortized)
+
+---
+
+## Network Flow
+
+### When to Recognize
+- Maximum matching in bipartite graphs
+- Minimum cut problems
+- Assignment/allocation problems
+- Supply chain / transportation optimization
+- "What is the maximum amount of X that can flow from A to B?"
+- "What is the minimum number of X to remove to disconnect Y from Z?"
+
+### Decision Guide
+
+| Problem Shape | Algorithm | Complexity |
+|--------------|-----------|------------|
+| Max flow, unweighted | Ford-Fulkerson (BFS = Edmonds-Karp) | O(VE²) |
+| Max flow, dense graphs | Dinic's algorithm | O(V²E) |
+| Max flow, large capacities | Capacity Scaling | O(E² log C) |
+| Min-cost max-flow | Successive shortest paths (Johnson's) | O(V²E log V) |
+| Bipartite matching | Hopcroft-Karp | O(E√V) |
+| Min vertex cover | König's theorem (reduce to max matching) | O(E√V) |
+| Assignment with costs | Hungarian algorithm / min-cost flow | O(n³) |
+
+### Key Insight
+Every max-flow problem has a dual min-cut problem (max-flow min-cut theorem). If you're asked "what's the minimum number of X to remove to disconnect Y from Z" — that's min-cut, which is max-flow.
+
+### Common Reductions
+- **Bipartite matching** → max flow with unit capacities from source to left, left to right, right to sink
+- **Vertex capacity** → split each vertex into v_in and v_out with edge of that capacity
+- **Multiple sources/sinks** → add super-source and super-sink
+- **Minimum path cover in DAG** → n - maximum matching in corresponding bipartite graph
+- **Project selection (max profit)** → min-cut formulation
+
+### Implementation Pattern
+```
+function max_flow(graph, source, sink):
+    total_flow = 0
+    while augmenting_path exists from source to sink in residual graph:
+        bottleneck = min capacity along path
+        total_flow += bottleneck
+        update residual graph (forward - bottleneck, backward + bottleneck)
+    return total_flow
+```

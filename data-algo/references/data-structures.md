@@ -32,6 +32,10 @@ Use this reference when the problem involves choosing or implementing a data str
 | Balanced with 2-4 children | 2-3-4 Tree | Precursor to Red-Black Tree |
 | Fast search in sorted linked list | Skip List | O(log n) search with O(n) space |
 | Static range min/max/GCD queries | Sparse Table | O(1) query after O(n log n) build |
+| Decrease-key in O(1) amortized | Fibonacci Heap | Optimal for Dijkstra/Prim's |
+| All suffixes of string, sorted | Suffix Array | O(n log n) build, O(m log n) search |
+| 2D spatial partitioning | Quadtree | O(log n) search in 2D space |
+| Suffix-based string operations | Suffix Tree | O(n) build with Ukkonen's |
 
 ---
 
@@ -265,3 +269,35 @@ Use this reference when the problem involves choosing or implementing a data str
 - **Use when**: Static arrays with many range min/max/GCD queries; LCA reduction to RMQ; competitive programming where O(1) query matters
 - **Avoid when**: Array is updated (use Segment Tree); need range sum (prefix sums are simpler for static); memory-constrained (uses O(n log n))
 - **Source**: `TheAlgorithms/C-Plus-Plus/data_structures/sparse_table.cpp`
+
+### Fibonacci Heap `A`
+- **What**: Lazy-merge heap with O(1) amortized insert, decrease-key, and merge. Collection of heap-ordered trees with lazy consolidation
+- **Time**: Insert O(1) amortized, Find-min O(1), Decrease-key O(1) amortized, Delete/Extract-min O(log n) amortized, Merge O(1)
+- **Space**: O(n)
+- **Use when**: Dijkstra's algorithm (improves to O(V log V + E)), Prim's MST (O(E + V log V)), any algorithm that performs many decrease-key operations; theoretically optimal for comparison-based priority queues
+- **Avoid when**: Practical implementations — constant factors are large and cache behavior is poor; binary heap is simpler and faster in practice for most inputs; when decrease-key is infrequent
+- **Source**: `williamfiset/Algorithms/datastructures/fibonacciheap`
+
+### Suffix Array `A`
+- **What**: Sorted array of all suffixes of a string, stored as starting indices. Space-efficient alternative to suffix tree
+- **Time**: Build O(n log n) typical (O(n) with SA-IS), Search O(m log n) where m = pattern length, LCP array construction O(n)
+- **Space**: O(n) integers
+- **Use when**: Pattern matching in large texts, longest repeated substring, longest common prefix queries, bioinformatics (genome analysis), building FM-index for compressed text search
+- **Avoid when**: Need online construction (suffix tree supports this); need frequent insertions/deletions to text
+- **Source**: `williamfiset/Algorithms/datastructures/suffixarray`
+
+### Suffix Tree `A`
+- **What**: Compressed trie of all suffixes of a string. Every internal node (except root) has at least 2 children. Edges labeled with substrings
+- **Time**: Build O(n) with Ukkonen's algorithm, Search O(m) where m = pattern length
+- **Space**: O(n) but with large constant factor (many pointers per node)
+- **Use when**: Multiple pattern matching queries on same text, longest common substring of two strings, palindrome finding, online suffix construction, generalized suffix tree for multiple strings
+- **Avoid when**: Memory is constrained (suffix array uses less space); single pattern search (KMP/Boyer-Moore are simpler); text changes frequently
+- **Source**: `TheAlgorithms/Python/data_structures/suffix_tree` | `williamfiset/Algorithms/datastructures/suffixarray` (SA can substitute)
+
+### Quadtree `A`
+- **What**: Tree where each internal node has exactly 4 children, recursively subdividing 2D space into quadrants. Point quadtree stores points; region quadtree partitions space uniformly
+- **Time**: Insert O(log n) avg, Search O(log n) avg, Range query O(√n + k) where k = results
+- **Space**: O(n) for point quadtree, O(resolution²) for region quadtree
+- **Use when**: 2D spatial indexing, collision detection in games, image compression (region quadtree), geographic information systems (GIS), adaptive mesh refinement
+- **Avoid when**: Data is in 1D (use BST/segment tree); high dimensions (use KD-tree for k > 2 but < 20); data is uniformly distributed with no spatial queries needed
+- **Source**: `williamfiset/Algorithms/datastructures/quadtree`

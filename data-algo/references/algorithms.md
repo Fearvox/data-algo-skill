@@ -9,25 +9,33 @@ Use this reference when you need to select or implement an algorithm. Organized 
 1. [Sorting](#sorting)
 2. [Searching](#searching)
 3. [Graphs](#graphs)
-4. [Strings](#strings)
-5. [Math](#math)
-6. [Numerical Methods](#numerical-methods)
-7. [Sets & Combinatorics](#sets--combinatorics)
-8. [Dynamic Programming Problems](#dynamic-programming-problems)
-9. [Backtracking Problems](#backtracking-problems)
-10. [Machine Learning](#machine-learning)
-11. [Cryptography](#cryptography)
-12. [Hashing](#hashing)
-13. [Compression & Encoding](#compression--encoding)
-14. [Streaming & Probabilistic](#streaming--probabilistic)
-15. [Geometry & Navigation](#geometry--navigation)
-16. [Range Queries](#range-queries)
-17. [Bit Manipulation (Advanced)](#bit-manipulation-advanced)
-18. [Probability & Statistics](#probability--statistics)
-19. [Physics Simulations](#physics-simulations)
-20. [CPU Scheduling](#cpu-scheduling)
-21. [Cellular Automata](#cellular-automata)
-22. [Other Classic Problems](#other-classic-problems)
+4. [Network Flow](#network-flow)
+5. [Strings](#strings)
+6. [Math](#math)
+7. [Numerical Methods](#numerical-methods)
+8. [Linear Algebra](#linear-algebra)
+9. [Linear Programming](#linear-programming)
+10. [Sets & Combinatorics](#sets--combinatorics)
+11. [Dynamic Programming Problems](#dynamic-programming-problems)
+12. [Backtracking Problems](#backtracking-problems)
+13. [Machine Learning](#machine-learning)
+14. [Cryptography](#cryptography)
+15. [Hashing](#hashing)
+16. [Compression & Encoding](#compression--encoding)
+17. [Streaming & Probabilistic](#streaming--probabilistic)
+18. [Geometry & Navigation](#geometry--navigation)
+19. [Range Queries](#range-queries)
+20. [Bit Manipulation (Advanced)](#bit-manipulation-advanced)
+21. [Probability & Statistics](#probability--statistics)
+22. [Physics Simulations](#physics-simulations)
+23. [CPU Scheduling](#cpu-scheduling)
+24. [Cellular Automata](#cellular-automata)
+25. [Digital Image Processing](#digital-image-processing)
+26. [Audio & Signal Processing](#audio--signal-processing)
+27. [Fractals](#fractals)
+28. [Quantum Computing](#quantum-computing)
+29. [Geodesy](#geodesy)
+30. [Other Classic Problems](#other-classic-problems)
 
 ---
 
@@ -229,6 +237,47 @@ Use this reference when you need to select or implement an algorithm. Organized 
 
 **Bridge Finding (Tarjan)** `A` — O(V + E). Find all bridge edges whose removal disconnects the graph. Extension of Tarjan's DFS with low-link values. Use for: network vulnerability analysis, identifying critical connections, biconnected components. Source: `TheAlgorithms/C-Plus-Plus/graph/bridge_finding_with_tarjan_algorithm.cpp`
 
+**Tarjan's SCC (Strongly Connected Components)** `A` — O(V + E). Single-pass DFS algorithm using a stack and low-link values to find all SCCs. More efficient than Kosaraju in practice (single DFS pass vs two). Use for: compiler dependency analysis, 2-SAT reduction, circuit analysis, social network community detection. Source: `TheAlgorithms/Python/graphs/tarjans_scc.py` | `williamfiset/Algorithms/graphtheory/TarjanSccSolverAdjacencyList.java`
+
+**2-SAT Solver** `A` — O(V + E). Determine satisfiability of boolean formula in 2-CNF form. Build implication graph, find SCCs with Tarjan/Kosaraju — satisfiable iff no variable and its negation are in same SCC. Use for: constraint satisfaction, scheduling with pairwise constraints, configuration validation. Source: `williamfiset/Algorithms/graphtheory/TwoSatSolverAdjacencyList.java`
+
+**Steiner Tree** `A` — NP-hard in general. Find minimum-weight tree connecting a given subset of vertices (terminal nodes). Exact DP solution: O(3^k × n + 2^k × n² + n × m × log n) where k = number of terminals. Use for: network design (connecting specific nodes), VLSI routing, phylogenetics. Source: `williamfiset/Algorithms/graphtheory/SteinerTree.java`
+
+**Chinese Postman Problem** `A` — O(V³) for undirected graphs. Find minimum-weight closed walk that traverses every edge at least once. For undirected: find minimum-weight perfect matching on odd-degree vertices. Use for: mail route optimization, snow plowing, street sweeping, garbage collection. Source: `williamfiset/Algorithms/graphtheory/ChinesePostmanProblem.java`
+
+**Eager Prim's MST** `A` — O(E log V). Improved Prim's using indexed priority queue — updates existing entries instead of lazy insertion. Avoids stale edges in priority queue. Use for: dense graphs where lazy Prim's creates too many stale entries. Source: `williamfiset/Algorithms/graphtheory/EagerPrimsAdjacencyList.java`
+
+---
+
+## Network Flow
+
+Algorithms for computing maximum flow, minimum cut, and related problems in flow networks.
+
+### Quick Selection Guide
+
+| Scenario | Algorithm | Complexity |
+|----------|-----------|-----------|
+| Max flow, integer capacities | Ford-Fulkerson (DFS) | O(E × max_flow) |
+| Max flow, general | Edmonds-Karp (BFS) | O(V × E²) |
+| Max flow, dense graphs | Dinic's algorithm | O(V² × E) |
+| Max flow, large capacities | Capacity Scaling | O(E² × log(max_cap)) |
+| Min-cost max-flow | Successive Shortest Paths (Johnson's) | O(V² × E × log V) |
+| Min-cost max-flow, simple | Bellman-Ford based MCMF | O(V × E × max_flow) |
+| Bipartite matching | Hopcroft-Karp | O(E × √V) |
+| Multi-source/multi-sink flow | Edmonds-Karp with super-source/sink | O(V × E²) |
+
+**Dinic's Algorithm** `A` — O(V² × E) time. Layered network approach: BFS builds level graph, DFS finds blocking flows. Much faster than Edmonds-Karp on dense graphs. O(E × √V) for unit-capacity graphs (bipartite matching). Use for: max flow on dense networks, bipartite matching, competitive programming. Avoid when: graph is very sparse (Edmonds-Karp may suffice). Source: `TheAlgorithms/Python/graphs/dinic.py` | `williamfiset/Algorithms/graphtheory/networkflow/Dinics.java`
+
+**Capacity Scaling** `A` — O(E² × log(max_cap)) time. Ford-Fulkerson variant that only uses augmenting paths with capacity >= delta, halving delta each phase. Avoids many small augmentations. Use for: networks with large capacity values where Ford-Fulkerson would be slow, practical max-flow implementations. Source: `williamfiset/Algorithms/graphtheory/networkflow/CapacityScalingSolverAdjacencyList.java`
+
+**Min-Cost Max-Flow (Johnson's)** `A` — O(V² × E × log V) time. Find maximum flow with minimum total cost. Uses Johnson's algorithm (Dijkstra with potentials) for shortest path computation. Use for: assignment problems with costs, transportation optimization, supply chain allocation. Source: `williamfiset/Algorithms/graphtheory/networkflow/MinCostMaxFlowJohnsons.java`
+
+**Min-Cost Max-Flow (Bellman-Ford)** `A` — O(V × E × max_flow) time. Simpler min-cost max-flow using Bellman-Ford to find shortest augmenting paths. Handles negative edge weights naturally. Use for: min-cost flow when graph has negative costs, simpler implementation when performance is not critical. Source: `williamfiset/Algorithms/graphtheory/networkflow/MinCostMaxFlowWithBellmanFord.java`
+
+**Edmonds-Karp (Multi-Source/Sink)** `A` — O(V × E²) time. Extension of Edmonds-Karp for multiple sources and sinks by adding virtual super-source and super-sink. Use for: supply/demand networks, multiple factory-to-warehouse routing, water distribution. Source: `TheAlgorithms/Python/graphs/edmonds_karp_multiple_source_and_sink.py`
+
+**Minimum Cut** `A` — O(V × E²) via max-flow min-cut theorem. Find minimum weight set of edges whose removal disconnects source from sink. Compute max flow, then BFS from source in residual graph to find cut. Use for: network reliability, image segmentation, community detection, "minimum removals to disconnect" problems. Source: `TheAlgorithms/Python/networking_flow/minimum_cut.py`
+
 ---
 
 ## Strings
@@ -285,6 +334,10 @@ Use this reference when you need to select or implement an algorithm. Organized 
 **Horspool Algorithm** `A` — O(n/m) best, O(n × m) worst. Simplified Boyer-Moore using only the bad character rule. Preprocessing builds shift table from last occurrence of each character in pattern. Simpler to implement than full Boyer-Moore with competitive practical performance. Use for: text editors, simple string search where implementation simplicity matters. Source: `TheAlgorithms/C-Plus-Plus/strings/horspool.cpp`
 
 **Duval Algorithm (Lyndon Factorization)** `A` — O(n) time, O(1) space. Decompose string into non-increasing sequence of Lyndon words (primitive strings that are lexicographically smaller than all their rotations). Use for: computing lexicographically smallest rotation, suffix array construction (Lyndon-based), string combinatorics. Source: `TheAlgorithms/C-Plus-Plus/strings/duval.cpp`
+
+**Suffix Array** `A` — O(n log n) build (O(n log² n) simpler), O(m log n) search where m = pattern length. Sorted array of all suffixes of a string. Space-efficient alternative to suffix tree. Use for: pattern matching, longest repeated substring, longest common prefix array construction, bioinformatics genome analysis. Source: `williamfiset/Algorithms/datastructures/suffixarray`
+
+**Aho-Corasick** `A` — O(n + m + z) where n = text length, m = total pattern length, z = matches. Multi-pattern string matching using a trie with failure links (automaton). Processes all patterns simultaneously in one pass over text. Use for: dictionary matching, intrusion detection, DNA motif finding, content filtering. Source: `TheAlgorithms/Python/strings/aho_corasick.py`
 
 ---
 
@@ -451,6 +504,24 @@ Use this reference when you need to select or implement an algorithm. Organized 
 
 ---
 
+## Linear Algebra
+
+Algorithms for matrix operations, linear systems, and vector computations beyond basic matrix multiplication.
+
+**Jacobi Iteration Method** `A` — O(n² × k) where k = iterations. Iterative solver for diagonally dominant linear systems Ax = b. Each variable updated independently using previous iteration values. Naturally parallelizable. Use for: large sparse systems, parallel computing, when direct methods are too expensive. Avoid when: matrix is not diagonally dominant (may not converge). Source: `TheAlgorithms/Python/linear_algebra/jacobi_iteration_method.py`
+
+**Matrix Inversion** `A` — O(n³). Compute A⁻¹ such that A × A⁻¹ = I. Via Gauss-Jordan elimination or LU decomposition. Use for: solving linear systems (though direct solve is preferred), computing pseudoinverse, control theory. Avoid when: matrix is ill-conditioned (use SVD instead). Source: `TheAlgorithms/Python/linear_algebra/matrix_inversion.py`
+
+**Strassen Matrix Multiplication** `A` — O(n^2.807) time. Divide-and-conquer: splits matrices into quadrants, uses 7 sub-multiplications instead of 8. Practical speedup for large matrices (n > 64). Use for: large matrix multiplication, computational geometry, graph algorithms on dense adjacency matrices. Ref: `TheAlgorithms/Python/divide_and_conquer/strassen_matrix_multiplication.py`
+
+---
+
+## Linear Programming
+
+**Simplex Method** `A` — O(2^n) worst case, polynomial in practice. Solve linear optimization problems: maximize c^T x subject to Ax <= b, x >= 0. Traverses vertices of feasible polytope. The workhorse of operations research. Use for: resource allocation, scheduling, transportation, diet problems, portfolio optimization. Avoid when: problem is non-linear (use convex optimization). Source: `TheAlgorithms/Python/linear_programming/simplex.py`
+
+---
+
 ## Sets & Combinatorics
 
 **Cartesian Product** `B` — All ordered pairs from two sets. O(n × m). Ref: `src/algorithms/sets/cartesian-product`
@@ -583,6 +654,16 @@ Use this reference when you need to select or implement an algorithm. Organized 
 
 **Elias Coding (Gamma/Delta)** `A` — Universal codes for positive integers. Gamma: O(2⌊log₂n⌋+1) bits. Delta: more efficient for larger numbers. Use for: variable-length integer encoding, information retrieval, data compression of integer sequences. Ref: `keon/algorithms/compression/elias`
 
+**Burrows-Wheeler Transform (BWT)** `A` — O(n log n) time, O(n) space. Reversible permutation that groups similar characters together, making data more compressible by subsequent algorithms (e.g., RLE, Huffman). Foundation of bzip2 compression. Use for: text compression preprocessing, bioinformatics (FM-index for genome alignment). Source: `TheAlgorithms/Python/data_compression/burrows_wheeler.py`
+
+**Lempel-Ziv (LZ77)** `A` — O(n) time. Dictionary-based lossless compression using a sliding window. Replaces repeated sequences with (distance, length) back-references. Foundation of gzip, PNG, ZIP. Use for: general-purpose file compression, network protocol compression. Source: `TheAlgorithms/Python/data_compression/lz77.py`
+
+**Lempel-Ziv-Welch (LZW)** `A` — O(n) time. Dictionary-based compression that builds dictionary dynamically during encoding. No dictionary transmitted — decoder rebuilds it. Used in GIF and early Unix compress. Use for: image compression (GIF), legacy systems. Source: `TheAlgorithms/Python/data_compression/lempel_ziv.py`
+
+**Coordinate Compression** `B` — O(n log n) time. Map large coordinate values to smaller range while preserving relative order. Sort unique values, assign sequential indices. Use for: segment tree on large ranges, computational geometry with large coordinates, competitive programming. Source: `TheAlgorithms/Python/data_compression/coordinate_compression.py`
+
+**PSNR (Peak Signal-to-Noise Ratio)** `B` — O(n) time. Measures quality of lossy compression by comparing original and compressed signals: PSNR = 10·log₁₀(MAX²/MSE). Higher = better quality. Use for: image/video compression quality assessment, codec comparison. Source: `TheAlgorithms/Python/data_compression/peak_signal_to_noise_ratio.py`
+
 ---
 
 ## Streaming & Probabilistic
@@ -604,6 +685,10 @@ Use this reference when you need to select or implement an algorithm. Organized 
 **Line Segment Intersection** `A` — O(1) per pair, O(n²) brute force for n segments. Determine if two line segments intersect using cross-product orientation tests. Handles collinear and endpoint cases. Use for: computational geometry, collision detection, geographic information systems, polygon clipping. Source: `TheAlgorithms/C-Plus-Plus/geometry/line_segment_intersection.cpp`
 
 **Smallest Enclosing Circle** `A` — O(n) expected (Welzl's algorithm). Find the smallest circle that encloses all given points. Randomized incremental algorithm with expected linear time. Use for: facility location, coverage problems, bounding volumes, wireless network coverage. Source: `TheAlgorithms/C-Plus-Plus/others/smallest_circle.cpp`
+
+**Point in Polygon (Ray Casting)** `B` — O(n) where n = polygon vertices. Cast ray from point, count edge crossings — odd = inside, even = outside. Works for any simple polygon (convex or concave). Use for: geographic containment queries, click detection in UI, geofencing. Source: `TheAlgorithms/Python/geometry/geometry.py`
+
+**Polygon Area (Shoelace Formula)** `B` — O(n). Compute area of simple polygon from vertex coordinates: A = ½|Σ(xᵢyᵢ₊₁ - xᵢ₊₁yᵢ)|. Works for any simple polygon. Use for: land area calculation, computational geometry, CAD applications. Source: `TheAlgorithms/Python/geometry/geometry.py`
 
 ---
 
@@ -667,6 +752,16 @@ Beyond basic set/get/clear/toggle operations.
 
 **Ground-to-Ground Projectile Motion** `B` — O(1). Compute range, max height, and time of flight for projectile launched from ground level at angle θ with initial velocity v. Range = v²sin(2θ)/g, Max height = v²sin²(θ)/(2g), Time = 2v·sin(θ)/g. Use for: physics simulations, game ballistics, trajectory planning. Source: `TheAlgorithms/C-Plus-Plus/physics/ground_to_ground_projectile_motion.cpp`
 
+**N-Body Simulation** `A` — O(n²) per timestep (brute force), O(n log n) with Barnes-Hut tree. Simulate gravitational (or electrostatic) interactions between n bodies. Each body exerts force on every other. Use for: galaxy simulations, molecular dynamics, particle systems, orbital mechanics. Source: `TheAlgorithms/Python/physics/n_body_simulation.py`
+
+**Reynolds Number Calculation** `B` — O(1). Re = ρvL/μ. Dimensionless number predicting flow regime: laminar (Re < 2300), transitional, or turbulent (Re > 4000). Use for: fluid dynamics simulation, pipe flow analysis, aerodynamic design. Source: `TheAlgorithms/Python/physics/reynolds_number.py`
+
+**Lorentz Transformation** `A` — O(1). Transform spacetime coordinates between inertial reference frames in special relativity. Handles four-vectors (time, x, y, z) with Lorentz factor γ = 1/√(1 - v²/c²). Use for: relativistic physics simulations, particle physics, GPS satellite corrections. Source: `TheAlgorithms/Python/physics/lorentz_transformation_four_vector.py`
+
+**Escape Velocity** `B` — O(1). v_escape = √(2GM/r). Minimum velocity for an object to escape gravitational field without further propulsion. Use for: space mission planning, orbital mechanics, planetary science. Source: `TheAlgorithms/Python/physics/escape_velocity.py`
+
+**Terminal Velocity** `B` — O(1). v_t = √(2mg/(ρAC_d)). Maximum falling speed when drag force equals gravitational force. Use for: parachute design, skydiving physics, atmospheric re-entry calculations. Source: `TheAlgorithms/Python/physics/terminal_velocity.py`
+
 ---
 
 ## CPU Scheduling
@@ -684,6 +779,82 @@ Algorithms used by operating systems to allocate CPU time to processes.
 **Conway's Game of Life** `B` — O(m × n) per generation. 2D cellular automaton with birth/survival rules (B3/S23). Turing-complete. Each cell is alive or dead based on neighbor count. Use for: simulation, emergence demonstrations, computational theory. Source: `TheAlgorithms/JavaScript/Cellular-Automata/ConwaysGameOfLife.js`
 
 **Elementary Cellular Automaton** `B` — O(n) per generation. 1D automaton with 256 possible rules (Wolfram's classification). Rule 110 is Turing-complete. Use for: pattern generation, complexity theory, pseudorandom sequences. Source: `TheAlgorithms/JavaScript/Cellular-Automata/Elementary.js`
+
+**Langton's Ant** `B` — O(1) per step. Simple 2-state cellular automaton: ant on grid turns right on white (flips to black), left on black (flips to white), then moves forward. Produces emergent highway pattern after ~10,000 steps. Use for: emergence demonstrations, chaotic systems, Turing machine equivalence. Source: `TheAlgorithms/Python/cellular_automata/langtons_ant.py`
+
+**Nagel-Schreckenberg Traffic Model** `B` — O(n) per timestep. Cellular automaton modeling vehicular traffic flow. Rules: accelerate, random braking, decelerate for other cars, move. Reproduces phantom traffic jams. Use for: traffic simulation, urban planning, transportation engineering. Source: `TheAlgorithms/Python/cellular_automata/nagel_schrekenberg.py`
+
+**Wa-Tor (Predator-Prey Simulation)** `B` — O(m × n) per generation. 2D cellular automaton simulating predator-prey ecosystem dynamics on a toroidal grid. Fish breed, sharks eat fish or starve. Models population oscillations (Lotka-Volterra dynamics). Use for: ecological modeling, population dynamics education. Source: `TheAlgorithms/Python/cellular_automata/wa_tor.py`
+
+---
+
+## Digital Image Processing
+
+Algorithms for analyzing, transforming, and extracting information from digital images.
+
+**Canny Edge Detection** `A` — O(m × n) per image. Multi-stage edge detector: Gaussian blur → gradient computation (Sobel) → non-maximum suppression → double thresholding → hysteresis edge tracking. Gold standard for edge detection. Use for: object boundary detection, feature extraction, computer vision preprocessing. Source: `TheAlgorithms/Python/digital_image_processing/edge_detection/canny.py`
+
+**Sobel Filter** `B` — O(m × n). Computes gradient magnitude using 3x3 convolution kernels for horizontal and vertical edges. First-order derivative approximation. Use for: edge detection, image gradient computation, feature detection preprocessing. Source: `TheAlgorithms/Python/digital_image_processing/filters/sobel_filter.py`
+
+**Gaussian Filter (Blur)** `B` — O(m × n × k²) where k = kernel size. Convolve image with Gaussian kernel for smoothing/noise reduction. Separable: can apply 1D filter horizontally then vertically for O(m × n × k). Use for: noise reduction, image preprocessing, scale-space construction. Source: `TheAlgorithms/Python/digital_image_processing/filters/gaussian_filter.py`
+
+**Median Filter** `B` — O(m × n × k²). Replace each pixel with median of its k×k neighborhood. Superior to Gaussian for removing salt-and-pepper noise while preserving edges. Use for: noise removal, image denoising, preprocessing for segmentation. Source: `TheAlgorithms/Python/digital_image_processing/filters/median_filter.py`
+
+**Bilateral Filter** `A` — O(m × n × k²). Edge-preserving smoothing: weights based on both spatial distance and intensity difference. Smooths flat regions while preserving sharp edges. Use for: photo enhancement, HDR imaging, depth map refinement. Source: `TheAlgorithms/Python/digital_image_processing/filters/bilateral_filter.py`
+
+**Gabor Filter** `A` — O(m × n × k²). Bandpass filter tuned to specific frequency and orientation. Combines Gaussian envelope with sinusoidal carrier. Use for: texture analysis, fingerprint recognition, iris recognition, visual cortex modeling. Source: `TheAlgorithms/Python/digital_image_processing/filters/gabor_filter.py`
+
+**Local Binary Pattern (LBP)** `A` — O(m × n). Texture descriptor: compare each pixel with neighbors, encode as binary number. Rotation-invariant and grayscale-invariant. Use for: face recognition, texture classification, material inspection. Source: `TheAlgorithms/Python/digital_image_processing/filters/local_binary_pattern.py`
+
+**Harris Corner Detection** `A` — O(m × n). Detect corner features using structure tensor eigenvalues. Corners have large eigenvalues in both directions. Use for: feature detection, image matching, panorama stitching, SLAM. Source: `TheAlgorithms/Python/computer_vision/harris_corner.py`
+
+**Horn-Schunck Optical Flow** `A` — O(m × n × k) where k = iterations. Estimate dense motion field between consecutive frames using global smoothness constraint. Variational method. Use for: motion estimation, video stabilization, action recognition, autonomous driving. Source: `TheAlgorithms/Python/computer_vision/horn_schunck.py`
+
+**Haralick Texture Descriptors** `A` — O(m × n × L²) where L = gray levels. Extract texture features from gray-level co-occurrence matrix (GLCM): contrast, correlation, energy, homogeneity. Use for: texture classification, medical image analysis, satellite imagery. Source: `TheAlgorithms/Python/computer_vision/haralick_descriptors.py`
+
+---
+
+## Audio & Signal Processing
+
+**Butterworth Filter** `A` — O(n) per sample (IIR). Maximally flat magnitude response in passband — no ripple. Design via analog prototype + bilinear transform. Use for: audio smoothing, anti-aliasing, biomedical signal filtering. Source: `TheAlgorithms/Python/audio_filters/butterworth_filter.py`
+
+**IIR Filter (Infinite Impulse Response)** `A` — O(n × (a + b)) where a, b = filter orders. Recursive filter using both input and previous output values: y[n] = Σ(b_k·x[n-k]) - Σ(a_k·y[n-k]). Computationally efficient but can be unstable. Use for: real-time audio processing, equalization, control systems. Source: `TheAlgorithms/Python/audio_filters/iir_filter.py`
+
+---
+
+## Fractals
+
+Self-similar geometric patterns generated by iterative mathematical processes.
+
+**Mandelbrot Set** `B` — O(n × max_iter) where n = pixels. For each point c in complex plane, iterate z = z² + c and check if |z| diverges. Color by iteration count at divergence. Use for: fractal visualization, chaos theory education, mathematical art generation. Source: `TheAlgorithms/Python/fractals/mandelbrot.py`
+
+**Julia Sets** `B` — O(n × max_iter). Like Mandelbrot but fix c and vary initial z₀. Each value of c produces a different Julia set. Connected Julia sets correspond to c values inside Mandelbrot set. Use for: fractal art, dynamical systems exploration, mathematical visualization. Source: `TheAlgorithms/Python/fractals/julia_sets.py`
+
+**Koch Snowflake** `B` — O(4^n) segments at iteration n. Start with triangle, recursively replace each line segment's middle third with two sides of equilateral triangle. Infinite perimeter, finite area. Use for: fractal geometry education, antenna design (fractal antennas), coastline modeling. Source: `TheAlgorithms/Python/fractals/koch_snowflake.py`
+
+**Sierpinski Triangle** `B` — O(3^n) triangles at iteration n. Recursively subdivide equilateral triangle into 4, remove center. Self-similar at all scales. Use for: fractal education, chaos game demonstration, antenna design. Source: `TheAlgorithms/Python/fractals/sierpinski_triangle.py`
+
+---
+
+## Quantum Computing
+
+Algorithms designed for quantum computers, often with exponential speedup over classical counterparts.
+
+**Quantum Fourier Transform (QFT)** `A` — O(n²) quantum gates for n qubits. Quantum analog of discrete Fourier transform. Operates on quantum superposition of all 2^n states simultaneously. Foundation of Shor's algorithm and quantum phase estimation. Use for: period finding, phase estimation, quantum simulation. Source: `TheAlgorithms/Python/quantum/q_fourier_transform.py`
+
+**BB84 Quantum Key Distribution** `A` — O(n) qubits for n-bit key. Protocol for secure key exchange using quantum mechanics. Alice sends qubits in random bases, Bob measures in random bases. Eavesdropping introduces detectable errors. Use for: quantum cryptography, secure communication, post-quantum security. Source: `TheAlgorithms/Python/quantum/bb84.py`
+
+**Deutsch-Jozsa Algorithm** `A` — O(1) quantum queries (vs O(2^(n-1) + 1) classical). Determine if a function f:{0,1}^n → {0,1} is constant (same output for all inputs) or balanced (equal 0s and 1s). First algorithm showing exponential quantum speedup. Use for: quantum computing education, oracle problem demonstrations. Source: `TheAlgorithms/Python/quantum/deutsch_jozsa.py`
+
+**Superdense Coding** `B` — O(1). Transmit 2 classical bits by sending 1 qubit, using a pre-shared entangled pair. Reversal of quantum teleportation. Use for: quantum communication, quantum information theory education. Source: `TheAlgorithms/Python/quantum/superdense_coding.py`
+
+---
+
+## Geodesy
+
+Algorithms for computing distances and positions on Earth's surface.
+
+**Lambert's Ellipsoidal Distance** `A` — O(1) per computation (iterative convergence). Geodesic distance on an oblate spheroid (WGS-84 ellipsoid). More accurate than Haversine for long distances. Accounts for Earth's polar flattening. Use for: high-precision navigation, surveying, aviation route planning. Source: `TheAlgorithms/Python/geodesy/lamberts_ellipsoidal_distance.py`
 
 ---
 
