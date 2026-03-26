@@ -73,6 +73,19 @@ cp -r data-algo-skill/data-algo ~/.claude/commands/data-algo
 cp -r data-algo-skill/data-algo-viz ~/.claude/commands/data-algo-viz
 ```
 
+#### Optional branches
+
+```bash
+# Competitive programming (ICPC/OI/Codeforces templates)
+cp -r data-algo-skill/data-algo-competitive ~/.claude/commands/data-algo-competitive
+
+# System design algorithms (load balancing, rate limiting, consensus)
+cp -r data-algo-skill/data-algo-system ~/.claude/commands/data-algo-system
+
+# Social platform patterns (ranking, signals, content moderation)
+cp -r data-algo-skill/data-algo-social ~/.claude/commands/data-algo-social
+```
+
 #### Project-level
 
 ```bash
@@ -111,7 +124,7 @@ The skill triggers automatically when you say things like:
 
 ## Knowledge Base
 
-Curated from 11 complementary sources, organized into 24 reference files across 5 skill branches:
+Curated from 12 complementary sources, organized into 24 reference files across 5 skill branches:
 
 | Source | Stars | Focus | What we extracted |
 |--------|-------|-------|-------------------|
@@ -120,6 +133,7 @@ Curated from 11 complementary sources, organized into 24 reference files across 
 | [twitter/the-algorithm](https://github.com/twitter/the-algorithm) | 62K+ | Production-first — Twitter/X's open-source recommendation system | Signal collection patterns, two-stage ranking, SimClusters community detection, PageRank reputation, content filtering pipelines |
 | [keon/algorithms](https://github.com/keon/algorithms) | 25K+ | Python algorithm library — graph, number theory, compression | Graph algorithms, number theory, compression, streaming patterns |
 | [TheAlgorithms/JavaScript](https://github.com/TheAlgorithms/JavaScript) | 34K+ | Community algorithm collection — sorting, geometry, hashing | Sorting variants, geometry, cellular automata, hashing |
+| [TheAlgorithms/C++](https://github.com/TheAlgorithms/C-Plus-Plus) | 31K+ | C++ algorithm collection — sorting, graphs, math, strings | Sorting variants, graph algorithms, dynamic programming, data structures |
 | [TheAlgorithms/Python](https://github.com/TheAlgorithms/Python) | 219K+ | Broad algorithm coverage — geometry, compression, quantum | Geometry, compression, quantum computing, image processing algorithms |
 | [williamfiset/Algorithms](https://github.com/williamfiset/Algorithms) | 18K+ | Deep graph theory — network flow, advanced graph algorithms | Network flow implementations, advanced graph theory |
 | [cp-algorithms](https://cp-algorithms.com) | 10K+ | Competitive programming gold standard (e-maxx.ru translation) | Segment trees, FFT/NTT, string algorithms, number theory |
@@ -137,7 +151,7 @@ Multiple perspectives: `javascript-algorithms` + `keon` + `TheAlgorithms` give u
 | `algorithms.md` | ~317 algorithms across 30 domains: Sorting (14), Searching (4), Graphs (14), Network Flow, Strings (8), Math (16), Numerical Methods, Linear Algebra, Sets (11), DP, Backtracking, ML, Crypto, Hashing, Compression, Streaming, Geometry, Range Queries, Bit Manipulation, Quantum Computing, and more |
 | `paradigms.md` | Decision flowchart for Brute Force, Greedy, D&C, DP, Backtracking + patterns: Two Pointers, Sliding Window, Monotonic Stack, Prefix Sums, Binary Search on Answer |
 | `big-o.md` | Growth rate tables, DS operation complexity, sorting comparison (stability/space), graph + string algo complexity, computation helpers for viz |
-| `glossary-zh.md` | 60+ Chinese-English term mappings + colloquial → algorithm lookup ("太慢了" → complexity analysis, "去重" → Hash Set, "找最大K个" → Heap) |
+| `glossary-zh.md` | 89+ Chinese-English term mappings across 6 domains + colloquial → algorithm lookup ("太慢了" → complexity analysis, "去重" → Hash Set, "限流" → Rate Limiting) |
 
 ### data-algo-competitive reference files
 
@@ -462,6 +476,28 @@ We're building an open algorithm knowledge layer for AI coding agents — and we
 - [ ] Source attribution included
 - [ ] Chinese glossary updated if applicable
 - [ ] `/sync` run to update README
+
+---
+
+## Hall of Fame
+
+Knowledge sources that power this skill:
+
+| Source | Stars | Contribution |
+|--------|-------|-------------|
+| [TheAlgorithms/Python](https://github.com/TheAlgorithms/Python) | 219K+ | Geometry, compression, quantum, image processing algorithms |
+| [labuladong/fucking-algorithm](https://github.com/labuladong/fucking-algorithm) | 133K+ | Problem-solving mental frameworks |
+| [trekhleb/javascript-algorithms](https://github.com/trekhleb/javascript-algorithms) | 190K+ | Core algorithm implementations + complexity data |
+| [ByteByteGoHq/system-design-101](https://github.com/ByteByteGoHq/system-design-101) | 81K+ | Visual system design patterns |
+| [twitter/the-algorithm](https://github.com/twitter/the-algorithm) | 62K+ | Production social platform patterns |
+| [karanpratapsingh/system-design](https://github.com/karanpratapsingh/system-design) | 42K+ | System design algorithm implementations |
+| [TheAlgorithms/JavaScript](https://github.com/TheAlgorithms/JavaScript) | 34K+ | Sorting, geometry, cellular automata, hashing |
+| [TheAlgorithms/C++](https://github.com/TheAlgorithms/C-Plus-Plus) | 31K+ | Graph algorithms, DP, data structures |
+| [OI-wiki](https://oi-wiki.org) | 26K+ | Chinese competitive programming wiki |
+| [keon/algorithms](https://github.com/keon/algorithms) | 25K+ | Graph, number theory, compression, streaming |
+| [williamfiset/Algorithms](https://github.com/williamfiset/Algorithms) | 18K+ | Deep graph theory, network flow |
+| [cp-algorithms](https://cp-algorithms.com) | 10K+ | Competitive programming gold standard (e-maxx.ru) |
+| [vercel-labs/json-render](https://github.com/vercel-labs/json-render) | — | Terminal visualization engine |
 
 ---
 
