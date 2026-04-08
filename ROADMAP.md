@@ -20,7 +20,7 @@ Five skill branches shipped and field-tested:
 
 24 reference files, 11 knowledge sources, ~400+ algorithms/patterns across all branches.
 
-Plus tooling: `/import-knowledge`, `.algo-profile/` snapshot system.
+Plus tooling: `.algo-profile/` snapshot system.
 
 ---
 
@@ -40,7 +40,7 @@ Plus tooling: `/import-knowledge`, `.algo-profile/` snapshot system.
 
 > **Deviations from v1.0 plan:** The originally planned sources (donnemartin/system-design-primer, yangshun/tech-interview-handbook, jwasham/coding-interview-university) were replaced with higher-quality alternatives discovered via edge-knowledge research. The substituted sources (cp-algorithms, OI-wiki, ByteByteGo, williamfiset) provide deeper algorithmic content with less overlap.
 
-Use `/import-knowledge <url>` to add any of these — contributions welcome.
+Contributions welcome — add reference files following the existing branch structure.
 
 ### New Skill Branches
 
@@ -133,11 +133,10 @@ Use these templates when opening an issue:
 #### Adding Knowledge (most common contribution)
 
 1. Fork the repo
-2. Run `/import-knowledge <source-url>` to auto-generate reference entries
-3. Review the diff — ensure no duplicates, correct Big-O notation (uppercase O), proper categorization
+2. Add entries to the appropriate `references/` file following existing format
+3. Ensure no duplicates, correct Big-O notation (uppercase O), proper categorization
 4. Update `glossary-zh.md` if Chinese terms apply
-5. Run `/sync` to update README
-6. Open a PR with title: `feat: import <source> knowledge — N new patterns`
+5. Open a PR with title: `feat: add <source> knowledge — N new patterns`
 
 #### Adding a New Skill Branch
 
