@@ -1,15 +1,14 @@
 ---
 name: data-algo-viz
 description: >-
-  Terminal visualization for algorithm analysis. Renders complexity comparisons,
-  data structure diagrams, algorithm profile dashboards, and before/after diffs
-  directly in the terminal using json-render + ink. Use this skill whenever the
-  data-algo skill has produced recommendations, profiles, or benchmark results
-  that would benefit from visual display. Also trigger when the user says
-  "显示", "show me", "visualize", "画图", "对比", "dashboard", "chart",
-  "compare algorithms", or wants to see their .algo-profile/ as a visual panel.
-  Trigger proactively after data-algo completes its Ship phase to show the
-  before/after improvement, and when reviewing benchmark results.
+  Terminal and HTML visualization for algorithm analysis. Renders complexity comparisons,
+  algorithm profile dashboards, before/after diffs, and full benchmark reports
+  as terminal UI (json-render + ink) or self-contained HTML with Playwright screenshots.
+  Use when data-algo has produced recommendations, profiles, or benchmark results
+  that need visual display. Also trigger when the user says "显示", "show me",
+  "visualize", "画图", "对比", "dashboard", "chart", "compare algorithms",
+  "生成报告", "screenshot", "截图", or wants a shareable report. Trigger proactively
+  after data-algo completes its Ship phase for before/after improvement visuals.
 ---
 
 # Data-Algo-Viz: Terminal Algorithm Visualization
@@ -177,6 +176,52 @@ Show the internal structure of a data structure being recommended. Useful when t
 - Trie: prefix paths, shared branches
 - LRU Cache: doubly-linked list + hash map combination
 
+### 6. HTML Benchmark Report (`html-report`)
+
+Generate a self-contained HTML report with dark-mode dashboard styling, then screenshot it with Playwright for archival. Use when analysis results need to be shared, committed to a repo, or viewed outside the terminal.
+
+**When to render**: After completing a full analysis cycle (diagnose → recommend → ship), or when the user asks for a shareable report, screenshot, or "生成报告".
+
+**Output**:
+1. A self-contained `.html` file (no external dependencies, inline CSS)
+2. A `.png` screenshot via Playwright CLI
+
+**How to generate**:
+
+```bash
+# 1. Write the HTML report to the project's docs/reports/ directory
+mkdir -p docs/reports
+# Generate the HTML file with inline data (see template below)
+
+# 2. Screenshot with Playwright CLI
+npx playwright screenshot --full-page \
+  "file://$(pwd)/docs/reports/YYYY-MM-DD-report-name.html" \
+  docs/reports/YYYY-MM-DD-report-name.png
+```
+
+**Design system** (dark-mode, monospace, GitHub-dark palette):
+- Background: `#0d1117`, Surface: `#161b22`, Border: `#30363d`
+- Text: `#c9d1d9`, Green: `#3fb950`, Red: `#f85149`, Yellow: `#d29922`, Blue: `#58a6ff`
+- Font: `'SF Mono', 'Fira Code', 'JetBrains Mono', monospace` at 13px
+- Components: stat cards (grid), bar charts (CSS), data tables, callout cards, KeyValue rows
+
+**Recommended panel structure**:
+1. **Stats grid** — 4 top-level metrics as large numbers
+2. **Distribution chart** — CSS bar chart comparing old vs new
+3. **Per-item table** — full data with color-coded rows (green=promoted, red=blocked, yellow=false negative)
+4. **Analysis cards** — callout cards with border-left accent for findings
+5. **Algorithm profile** — algorithm names + complexity
+6. **Summary** — KeyValue pairs for key metrics
+
+**Template**: `templates/html-report.html`
+
+**Known ink limitations** this solves:
+- `Table`, `Markdown`, `Text`, and `Callout` components in `@json-render/ink` may silently fail to render content
+- `KeyValue`, `BarChart`, `Heading`, `Divider`, and `Badge` work reliably
+- HTML reports have no such limitations — full tables, colored rows, and rich formatting
+
+---
+
 ## How to Generate Specs
 
 ### Step 1: Collect the data
@@ -256,6 +301,7 @@ This skill extends data-algo's workflow. Here's when each visualization triggers
 | Profile card created | `profile-dashboard` | On request |
 | Benchmark run | `benchmark` | Yes — after eval-viewer |
 | User asks "how?" | `structure-anatomy` | On request |
+| Full analysis complete | `html-report` | On request — shareable report + screenshot |
 
 ## Component Reference
 

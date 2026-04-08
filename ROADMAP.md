@@ -16,7 +16,7 @@ Five skill branches shipped and field-tested:
 | **data-algo-social** | 6 files | Twitter/X recommendation patterns for social platforms |
 | **data-algo-competitive** | 6 files | Competitive programming: segment trees, FFT/NTT, advanced graphs, geometry |
 | **data-algo-system** | 6 files | System design: load balancing, caching, sharding, consensus, rate limiting |
-| **data-algo-viz** | 4 templates | Terminal visualization via @json-render/ink |
+| **data-algo-viz** | 5 templates | Terminal + HTML visualization via @json-render/ink + Playwright |
 
 24 reference files, 11 knowledge sources, ~400+ algorithms/patterns across all branches.
 
@@ -54,7 +54,7 @@ Use `/import-knowledge <url>` to add any of these — contributions welcome.
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| Web renderer | `@json-render/react` alongside ink for browser-based dashboards | Planned |
+| HTML report + screenshot | Self-contained dark-mode HTML dashboards + Playwright PNG screenshots | ✅ Shipped |
 | Interactive mode | Clickable complexity comparison (select input size with slider) | Exploring |
 | Profile timeline | Show `.algo-profile/` evolution over time | Exploring |
 

@@ -282,7 +282,7 @@ Every reference file includes implementations and three scale tiers (Hobby / Gro
 
 ## data-algo-viz
 
-Companion skill that renders algorithm analysis as rich terminal UI using [`@json-render/ink`](https://github.com/vercel-labs/json-render).
+Companion skill that renders algorithm analysis as rich terminal UI using [`@json-render/ink`](https://github.com/vercel-labs/json-render), or as self-contained HTML reports with Playwright screenshots for sharing and archival.
 
 | Visualization | When | What you see |
 |--------------|------|-------------|
@@ -291,6 +291,7 @@ Companion skill that renders algorithm analysis as rich terminal UI using [`@jso
 | **Profile Dashboard** | On request | Table of all profiled algorithms in the project |
 | **Benchmark** | After eval runs | Pass rate bars, per-eval breakdown table |
 | **Structure Anatomy** | When asked "how does this work?" | Visual diagram of the data structure |
+| **HTML Report** | After full analysis cycle | Self-contained dark-mode HTML dashboard + PNG screenshot |
 
 #### Terminal output example
 
@@ -379,11 +380,12 @@ data-algo-skill/
 │   ├── scripts/
 │   │   ├── render.mjs               # Terminal renderer (ink)
 │   │   └── package.json             # @json-render/ink dependencies
-│   ├── templates/                   # JSON spec templates
+│   ├── templates/                   # JSON spec templates + HTML report
 │   │   ├── complexity-compare.json
 │   │   ├── before-after.json
 │   │   ├── profile-dashboard.json
-│   │   └── benchmark.json
+│   │   ├── benchmark.json
+│   │   └── html-report.html         # Self-contained HTML report template
 │   └── references/
 │       └── component-props.md       # ink component prop reference
 │

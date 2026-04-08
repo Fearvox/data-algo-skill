@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{REPORT_TITLE}}</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #c9d1d9;
+    --text-dim: #8b949e;
+    --green: #3fb950;
+    --red: #f85149;
+    --yellow: #d29922;
+    --blue: #58a6ff;
+    --purple: #bc8cff;
+    --cyan: #39d353;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 24px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 18px; font-weight: 600; color: #f0f6fc; margin-bottom: 4px; }
+  .subtitle { color: var(--text-dim); font-size: 12px; margin-bottom: 24px; }
+
+  /* Panel */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .panel-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: #21262d;
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+  }
+  .stat-value { font-size: 28px; font-weight: 700; line-height: 1.2; }
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+
+  /* Bar Chart */
+  .bar-row { display: flex; align-items: center; margin-bottom: 4px; font-size: 12px; }
+  .bar-label { width: 60px; text-align: right; margin-right: 10px; color: var(--text-dim); }
+  .bar-track {
+    flex: 1; height: 18px; background: #21262d; border-radius: 3px; overflow: hidden;
+  }
+  .bar-fill { height: 100%; border-radius: 3px; }
+  .bar-value { width: 30px; text-align: right; margin-left: 8px; font-weight: 600; font-size: 12px; }
+  .bar-fill.old { background: #484f58; }
+  .bar-fill.new-b { background: var(--green); }
+  .bar-fill.new-c { background: var(--blue); }
+  .bar-fill.new-d { background: var(--yellow); }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th {
+    text-align: left; font-weight: 600; color: var(--text-dim); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 6px 8px; border-bottom: 1px solid var(--border);
+  }
+  td { padding: 5px 8px; border-bottom: 1px solid #21262d; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  /* Tier colors */
+  .tier { font-weight: 700; font-size: 13px; }
+  .tier-a { color: var(--purple); }
+  .tier-b { color: var(--green); }
+  .tier-c { color: var(--blue); }
+  .tier-d { color: var(--text-dim); }
+  .up { color: var(--green); }
+  .down { color: var(--text-dim); }
+  .warn { color: var(--yellow); }
+  .caps { color: var(--red); }
+
+  /* Badges */
+  .badge {
+    display: inline-block; padding: 2px 8px;
+    border-radius: 12px; font-size: 11px; font-weight: 600;
+  }
+  .badge-green { background: #1a3a2a; color: var(--green); }
+  .badge-yellow { background: #3a2f1a; color: var(--yellow); }
+  .badge-red { background: #3a1a1a; color: var(--red); }
+  .badge-blue { background: #1a2a3a; color: var(--blue); }
+  .badge-dim { background: #21262d; color: var(--text-dim); }
+
+  /* Callout cards */
+  .fn-card {
+    background: #21262d;
+    border-left: 3px solid var(--yellow);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+  }
+  .fn-name { font-weight: 600; color: var(--yellow); margin-bottom: 4px; }
+  .fn-detail { color: var(--text-dim); }
+  .fn-fix { color: var(--green); margin-top: 4px; }
+
+  /* Algorithm row */
+  .algo-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid #21262d; font-size: 12px;
+  }
+  .algo-row:last-child { border-bottom: none; }
+  .algo-name { font-weight: 600; color: var(--purple); }
+  .algo-complexity { color: var(--cyan); }
+
+  /* KV rows */
+  .kv-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0; border-bottom: 1px solid #21262d; font-size: 12px;
+  }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-label { color: var(--text-dim); font-weight: 600; }
+  .kv-value { color: var(--text); text-align: right; }
+
+  .footer {
+    text-align: center; color: var(--text-dim); font-size: 10px;
+    margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!--
+  DATA-ALGO-VIZ HTML REPORT TEMPLATE
+
+  Usage:
+  1. Copy this file to your project: docs/reports/YYYY-MM-DD-<name>.html
+  2. Replace {{PLACEHOLDERS}} with real data
+  3. Add/remove panels as needed — each .panel is self-contained
+  4. Screenshot: npx playwright screenshot --full-page "file://$(pwd)/path.html" output.png
+
+  Available panel types:
+  - Stats grid: .stats-grid > .stat-card (4 top-level metrics)
+  - Bar chart: .bar-row > .bar-track > .bar-fill (side-by-side comparison)
+  - Data table: <table> with color-coded rows (.up, .down, .warn, .caps)
+  - Callout card: .fn-card with .fn-name, .fn-detail, .fn-fix
+  - Algorithm profile: .algo-row with .algo-name + .algo-complexity
+  - KV summary: .kv-row with .kv-label + .kv-value
+-->
+
+<h1>{{REPORT_TITLE}}</h1>
+<div class="subtitle">{{PROJECT_NAME}} &middot; {{DATE}} &middot; {{DESCRIPTION}}</div>
+
+<!-- Stats Grid — replace values -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value" style="color:var(--green)">{{STAT_1_VALUE}}</div>
+    <div class="stat-label">{{STAT_1_LABEL}}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:var(--green)">{{STAT_2_VALUE}}</div>
+    <div class="stat-label">{{STAT_2_LABEL}}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:var(--yellow)">{{STAT_3_VALUE}}</div>
+    <div class="stat-label">{{STAT_3_LABEL}}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value" style="color:var(--yellow)">{{STAT_4_VALUE}}</div>
+    <div class="stat-label">{{STAT_4_LABEL}}</div>
+  </div>
+</div>
+
+<!-- Panel: Bar Chart Comparison -->
+<div class="panel">
+  <div class="panel-title">{{CHART_PANEL_TITLE}}</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div>
+      <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;font-weight:600">{{LEFT_LABEL}}</div>
+      <!-- Add .bar-row elements for left side -->
+    </div>
+    <div>
+      <div style="font-size:11px;color:var(--green);margin-bottom:8px;font-weight:600">{{RIGHT_LABEL}}</div>
+      <!-- Add .bar-row elements for right side -->
+    </div>
+  </div>
+</div>
+
+<!-- Panel: Data Table -->
+<div class="panel">
+  <div class="panel-title">{{TABLE_PANEL_TITLE}}</div>
+  <table>
+    <thead>
+      <tr>
+        <!-- Add <th> columns -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Add <tr> rows with color classes: .up, .down, .warn, .caps -->
+      <!-- Example:
+      <tr style="background:#1a3a2a"><td class="up">Name</td><td>Detail</td></tr>
+      <tr style="background:#3a2f1a"><td class="warn">Name</td><td>Detail</td></tr>
+      <tr style="background:#3a1a1a"><td class="caps">Name</td><td>Detail</td></tr>
+      -->
+    </tbody>
+  </table>
+  <div style="margin-top:10px;display:flex;gap:10px">
+    <!-- Add .badge elements for summary counts -->
+  </div>
+</div>
+
+<!-- Panel: Analysis / Callout Cards -->
+<div class="panel">
+  <div class="panel-title">{{ANALYSIS_PANEL_TITLE}}</div>
+  <!-- Add .fn-card elements:
+  <div class="fn-card">
+    <div class="fn-name">Title</div>
+    <div class="fn-detail"><strong>Issue:</strong> description</div>
+    <div class="fn-fix"><strong>Fix:</strong> resolution</div>
+  </div>
+  -->
+</div>
+
+<!-- Panel: Algorithm Profile -->
+<div class="panel">
+  <div class="panel-title">Algorithm Profile</div>
+  <!-- Add .algo-row elements:
+  <div class="algo-row">
+    <div><span class="algo-name">Algorithm Name</span>
+      <div style="color:var(--text-dim);font-size:11px;margin-top:2px">Description</div>
+    </div>
+    <div class="algo-complexity">O(n) / O(k)</div>
+  </div>
+  -->
+</div>
+
+<!-- Panel: Summary -->
+<div class="panel">
+  <div class="panel-title">Summary</div>
+  <!-- Add .kv-row elements:
+  <div class="kv-row"><span class="kv-label">Label</span><span class="kv-value">Value</span></div>
+  -->
+</div>
+
+<div class="footer">
+  Generated by data-algo-viz &middot; {{PROJECT_NAME}} &middot; {{DATE}}
+</div>
+
+</body>
+</html>
