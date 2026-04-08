@@ -1,3 +1,5 @@
+<p align="center"><a href="README.md">English</a> | <strong>中文</strong></p>
+
 <h1 align="center">data-algo-skill</h1>
 
 <p align="center">
