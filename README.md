@@ -3,7 +3,7 @@
 <h1 align="center">data-algo-skill</h1>
 
 <p align="center">
-  [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?style=flat-square&logo=github-sponsors)](https://github.com/sponsors/Synslius)
+  [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?style=flat-square&logo=github-sponsors)](https://github.com/sponsors/Fearvox)
   Algorithm consultant skill for <a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code</a>.<br>
   Diagnoses bottlenecks, recommends data structures, implements the fix,<br>
   archives decisions in a per-project algorithm profile.
