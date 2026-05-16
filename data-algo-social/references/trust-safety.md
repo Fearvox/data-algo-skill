@@ -713,3 +713,201 @@ When building a data collection or content ranking pipeline, verify:
 - [ ] Platform rate limits are respected
 - [ ] Opt-out registry exists and purge is implemented
 - [ ] All data access is audit-logged
+
+---
+
+## 6. Scale Tier — Brand Safety + PTOS Policy + Ads Blending
+
+This section applies when ads inventory exists, brand-safety SLAs are contractual
+obligations with advertisers, and PTOS violation volume is high enough that automated
+classifier enforcement is a hard requirement. Read §1–§5 first.
+
+### 6.1 When you reach this
+
+Read this section when all three conditions hold:
+
+- **Ads inventory is live.** You need to inject ad slots into a ranked organic feed
+  without disrupting the engagement-score ordering of organic posts.
+- **Brand-safety SLAs are contractual.** Advertisers have signed agreements that
+  their ads will not appear adjacent to content in specified sensitive categories;
+  violation means financial clawbacks or advertiser churn.
+- **PTOS enforcement volume exceeds manual capacity.** At 1M+ posts/day an automated
+  classifier must produce a per-post severity score and route to an action without a
+  human in the loop for the majority of cases.
+
+### 6.2 PTOS Policy Enforcement via Grox Classifier
+
+PTOS stands for Platform Terms Of Service — the set of policies governing what content
+is permitted on the platform at all.
+
+The Grox classifier stack (`grox/classifiers/content/safety_ptos.py`) runs a
+vision-language model against every post and returns a structured
+`SafetyPostAnnotations` object that includes a list of violated policy categories and
+a per-category `SafetyPolicy` decision. That output is then mapped to a platform
+action. The table below captures the severity-to-action mapping that the
+`SafetyPtosCategoryClassifier` and `SafetyPtosPolicyClassifier` pipeline feeds into:
+
+```python
+from enum import Enum
+
+class PTOSSeverity(Enum):
+    NONE   = "none"    # no violation detected
+    LOW    = "low"     # borderline / context-dependent
+    MEDIUM = "medium"  # clear violation, not immediately harmful
+    HIGH   = "high"    # severe: csam, credible threats, gore
+
+# severity → (action, requires_human_review)
+# Derived from grox/classifiers/content/safety_ptos.py policy categories.
+PTOS_ACTION_TABLE = {
+    PTOSSeverity.NONE:   ("allow",              False),
+    PTOSSeverity.LOW:    ("label_sensitive",    False),
+    PTOSSeverity.MEDIUM: ("demote_visibility",  True),
+    PTOSSeverity.HIGH:   ("suppress_immediate", True),
+}
+
+def resolve_ptos_action(severity: PTOSSeverity):
+    return PTOS_ACTION_TABLE[severity]
+```
+
+Action examples by severity level:
+
+- **suppress**: remove from all recommendation surfaces immediately; post remains
+  accessible via direct URL but receives zero organic distribution
+- **label_sensitive**: attach a content warning interstitial; post is eligible for
+  ranking but the label is passed to brand-safety tracking (§6.3) to flag
+  ad-adjacency risk
+- **demote_visibility**: rank score is multiplied by a penalty weight (typically
+  0.01–0.1) before feed insertion; content still surfaces but with very low priority
+- **escalate_to_human**: post is held from distribution and placed in a moderation
+  queue; a human reviewer makes the final allow/remove decision within an SLA window
+
+### 6.3 Brand Safety Tracking
+
+Brand safety tracking records ad-adjacency safety state for each piece of content in
+the ranked feed, operating at the level of advertiser category policy rather than
+platform policy. Different advertisers have different thresholds: a news publisher
+running ads may tolerate political content; a children's toy brand cannot appear
+adjacent to any profanity, even mild.
+
+The distinction between PTOS and brand safety is important: PTOS enforcement is
+binary (the post either violates platform rules or it does not), whereas brand safety
+operates on a spectrum. A post can be fully PTOS-compliant and still be unsuitable
+for ad adjacency under a specific advertiser's sensitivity configuration.
+
+Sensitive-content boundary types tracked per post in the brand-safety verdict:
+
+- **Violence**: depictions of physical harm, weapons imagery, combat footage —
+  high-risk for most advertiser categories
+- **Adult / sexually explicit**: any content meeting the platform's adult-content
+  threshold; typically blocks the widest set of advertisers
+- **Political / controversial**: content touching elections, policy, or social
+  controversy; blocks advertisers with explicit political-neutrality requirements
+- **Profanity / offensive language**: strong language that does not reach PTOS-level
+  hate speech but violates advertiser safe-environment requirements
+- **Tragedy / sensitive events**: content about deaths, disasters, or crises;
+  advertisers often opt out of these contexts even when the coverage is factual
+
+The `BrandSafetyVerdict` proto (`home-mixer/ads/util.rs`) collapses this multi-axis
+signal into a single risk level (`BsrUnknown`, `BsrLow`, `BsrIas`, `MediumRisk`) per
+post — the value the ads blending logic reads at slot allocation time (§6.4). PTOS
+outcomes feed into brand-safety verdicts in one direction: a post labeled
+`label_sensitive` by the PTOS pipeline automatically receives at minimum `MediumRisk`
+for ad-adjacency purposes.
+
+### 6.4 Ads Blending
+
+Ads blending injects ad slots into a ranked organic feed in a way that respects both
+the engagement-score ordering of organic posts and the brand-safety verdict of every
+post adjacent to a potential insertion point. The core invariant is that an ad must
+never be placed immediately before or after a post carrying a `MediumRisk` or higher
+brand-safety verdict — what the source calls a `has_avoid` condition
+(`home-mixer/ads/util.rs`).
+
+The pseudocode below adapts the `SafeGapAdsBlender` + `assign_ads_to_gaps` pattern
+from `home-mixer/ads/safe_gap_blender.rs`, translated to Python for readability:
+
+```python
+from typing import List
+
+MIN_POSTS_FOR_ADS  = 5   # minimum organic posts before any ad is placed
+REQUESTED_GAP      = 3   # target organic posts between consecutive ads
+MIN_GAP            = 2   # hard minimum gap
+
+def has_brand_safety_avoid(post) -> bool:
+    """True when post carries MediumRisk or higher brand-safety verdict."""
+    return getattr(post, "brand_safety_verdict", "low") in ("medium_risk", "high_risk")
+
+def find_safe_gaps(organic: list) -> List[int]:
+    """Positions where an ad may be inserted: both neighbours must be safe."""
+    return [
+        g for g in range(1, len(organic))
+        if not has_brand_safety_avoid(organic[g - 1])
+        and not has_brand_safety_avoid(organic[g])
+    ]
+
+def blend_ads(organic: list, ads: list) -> list:
+    if not ads or len(organic) < MIN_POSTS_FOR_ADS:
+        return list(organic)
+    safe_gaps = find_safe_gaps(organic)
+    placements, prev = [], 0
+    for ad in ads:
+        min_pos = (prev + MIN_GAP) if placements else 1
+        eligible = [g for g in safe_gaps if g >= min_pos]
+        if not eligible:
+            break
+        ideal  = (prev + REQUESTED_GAP) if placements else REQUESTED_GAP
+        chosen = min(eligible, key=lambda g: abs(g - ideal))
+        placements.append((chosen, ad))
+        prev = chosen
+    result = list(organic)
+    for offset, (pos, ad) in enumerate(sorted(placements)):
+        result.insert(pos + offset, ad)
+    return result
+```
+
+The interaction with §6.3: `find_safe_gaps` is the exact point where brand-safety
+state gates ad placement — any post flagged as `MediumRisk` creates a no-go zone that
+blocks the two adjacent positions, not just the position it occupies.
+
+### 6.5 Post-Selection Visibility Filtering
+
+Post-selection visibility filtering is a final pass that removes posts from the
+already-ranked and selected feed for hard reasons: the post was deleted after
+selection, the author was suspended mid-request, or the content was classified as
+spam, violence, or gore by a late-arriving signal. This pass runs after ranking
+completes because some filter signals (deletion events, async classifier results)
+arrive too late to apply upstream.
+
+The decision pseudocode below reflects the README "Filtering (Post-Selection)" stage:
+
+```python
+from enum import Enum
+
+class VisibilityVerdict(Enum):
+    SHOW            = "show"
+    HIDE_DELETED    = "hide_deleted"
+    HIDE_SUSPENDED  = "hide_suspended"
+    HIDE_SPAM       = "hide_spam"
+    HIDE_GORE       = "hide_gore_violence"
+
+def post_selection_visibility_filter(post, ctx) -> VisibilityVerdict:
+    if post.is_deleted:
+        return VisibilityVerdict.HIDE_DELETED        # async deletion event
+    if post.author.is_suspended:
+        return VisibilityVerdict.HIDE_SUSPENDED      # account action mid-request
+    if post.spam_score > ctx.spam_threshold:
+        return VisibilityVerdict.HIDE_SPAM           # late-arriving spam signal
+    if post.gore_score > 0.8 or post.violence_score > 0.9:
+        return VisibilityVerdict.HIDE_GORE           # late-arriving classifier result
+    return VisibilityVerdict.SHOW
+
+# Apply over the already-selected set (typically 20-50 posts)
+def apply_visibility_filter(posts: list, ctx) -> list:
+    return [p for p in posts
+            if post_selection_visibility_filter(p, ctx) == VisibilityVerdict.SHOW]
+```
+
+Trade-off: moving all filters post-selection increases tail latency and cache miss
+rate with no benefit — the vast majority of removals are predictable and belong
+upstream (§1 runs legal and quality filters at ingestion for this reason). This
+pass stays intentionally narrow: only async signals belong here.
