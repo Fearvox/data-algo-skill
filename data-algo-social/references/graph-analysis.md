@@ -912,3 +912,80 @@ function pruneGraph(
 | Discover content via network effects | Random walk on bipartite graph | 5.1 |
 | Cross community boundaries in discovery | Entity nodes as bridges | 5.2 |
 | Keep graph operations fast | Graph pruning strategies | 5.3 |
+
+---
+
+## 6. xAI 2026 Addition — Mutual Follow Scores + Impression Bloom Filter
+
+The xAI 2026 `home-mixer` adds two graph-derived signals as pluggable
+hydrators on top of the existing §1–§5 infrastructure.
+
+### 6.1 Mutual follow score
+
+The mutual follow score captures "are A and B in each other's network?" as a
+continuous value — used as a candidate hydrator signal and a Phoenix scoring
+feature alongside PageRank-derived reputation.
+
+```python
+from typing import Dict, Set
+def mutual_follow_score(
+    user_a: str, user_b: str,
+    follow_graph: Dict[str, Set[str]],
+    method: str = "resource_allocation",  # or "jaccard"
+) -> float:
+    na, nb = follow_graph.get(user_a, set()), follow_graph.get(user_b, set())
+    shared = na & nb
+    if not shared:
+        return 0.0
+    if method == "jaccard":
+        return len(shared) / len(na | nb)
+    return sum(1.0 / len(follow_graph.get(n, {n})) for n in shared)
+```
+
+The resource-allocation index up-weights shared neighbors with small
+followings, making reciprocity a stronger feed-quality signal than raw follow
+count. See §1 User Graph Patterns for the follow-edge data structures.
+
+### 6.2 Impression bloom filter
+
+The impression bloom filter answers "has this user seen this post recently?"
+in O(k) time with sub-kilobyte memory per user, acting as a query hydrator.
+
+```python
+import hashlib, math
+class ImpressionBloomFilter:
+    """Per-user bloom filter; size-capped half-clear approximates TTL."""
+    def __init__(self, capacity: int = 1_000, fpr: float = 0.01):
+        self.m = math.ceil(-capacity * math.log(fpr) / math.log(2) ** 2)
+        self.k = max(1, round((self.m / capacity) * math.log(2)))
+        self.bits = bytearray(math.ceil(self.m / 8))
+        self.count, self.cap = 0, capacity
+    def add(self, post_id: str) -> None:
+        if self.count >= self.cap:              # decay: clear lower half
+            h = len(self.bits) // 2
+            self.bits[:h] = bytearray(h)
+            self.count //= 2
+        for i in self._slots(post_id):
+            self.bits[i >> 3] |= 1 << (i & 7)
+        self.count += 1
+    def seen(self, post_id: str) -> bool:
+        return all(self.bits[i >> 3] & (1 << (i & 7))
+                   for i in self._slots(post_id))
+    def _slots(self, key: str):
+        d = hashlib.sha256(key.encode()).digest()
+        b, s = int.from_bytes(d[:8], "big"), int.from_bytes(d[8:16], "big") | 1
+        return [(b + i * s) % self.m for i in range(self.k)]
+```
+
+- **False-positive vs memory**: `capacity=1000, fpr=0.01` → ~1.2 KB; doubling
+  capacity doubles memory, not FPR.
+- **Insertion cadence**: call `add()` at serve time, after feed delivery.
+- **Decay**: half-clear approximates a sliding window; full reset for strict TTL.
+
+### 6.3 Integration into existing PageRank pipeline
+
+The mutual follow score enriches **§2 Reputation Scoring**: pass it as an
+extra edge-weight feature alongside raw authority rank in the §4 composite
+scorer. The impression bloom filter integrates with **§3 Growth Pattern
+Analysis** as a dedup pre-pass — call `filter.seen(post_id)` before computing
+engagement velocity to prevent stale impressions from inflating EMA signals.
