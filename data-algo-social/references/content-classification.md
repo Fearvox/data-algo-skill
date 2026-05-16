@@ -780,3 +780,245 @@ function deduplicatePosts(
 5. **Need dedup across platforms?** SimHash with hamming distance <= 3 catches near-duplicates.
 6. **Want to find the creator's niche?** Compute over-index vs platform benchmark (Section 5).
 7. **Tracking content strategy shifts?** Use temporal classification with rolling windows.
+
+---
+
+## 6. Scale Tier — Grox Transformer Content Understanding
+
+> **When you reach this:** This section is for teams running cross-modal
+> classification at 1M+ posts/day with a GPU budget and ML infrastructure.
+> If you are at the Baseline tier (inverted index, ≤100K posts/day), skip
+> this section — the earlier sections cover your scale. Return here when
+> the inverted-index approach starts showing gaps: keyword ambiguity
+> across languages, cross-modal posts (text + image + video), or
+> classifier maintenance burden growing faster than your team.
+
+### 6.1 When you reach this
+
+The inverted-index classifier in Section 1 handles most single-language
+text pipelines well. You have outgrown it when two or three of the
+following signals appear simultaneously:
+
+- **Cross-modal content dominates your stream.** Posts pair text with
+  images or short video clips, and keyword-only classification produces
+  too many false negatives (a post tagged #cooking with a recipe video
+  but minimal text is missed entirely).
+- **Volume exceeds 1M posts/day with cross-lingual traffic.** Maintaining
+  separate keyword lists per language becomes operationally expensive;
+  classification drift between locales accumulates.
+- **The inverted index cannot generalize.** New topics trend faster than
+  keyword lists can be updated. Ambiguous tokens (e.g. "sick" = ill vs.
+  slang for excellent) require per-context disambiguation that keyword
+  matching cannot provide.
+- **You need shared signal across classifiers.** Spam detection, content
+  category, and policy enforcement currently run three separate pipelines
+  re-tokenizing the same posts. A single transformer embedding pass
+  amortizes that compute.
+
+### 6.2 Transformer Embedder (replaces inverted-index classifier)
+
+Grox replaces per-keyword lookup with dense embeddings: each post is
+converted to a fixed-size vector by a transformer encoder, and all
+downstream classifiers operate on that shared representation rather than
+raw tokens. The embedder runs once per post; classifier heads are thin
+linear layers on top of frozen or lightly fine-tuned embeddings.
+
+```python
+# Adapted from grox/embedder/multimodal_post_embedder_v5.py
+# Illustrative — not verbatim production code.
+
+import numpy as np
+
+EMBED_DIM = 1024  # truncated from full model output
+
+class PostEmbedder:
+    """Wraps the Grok-based recsys embedding model.
+
+    One instance is shared across all classifier heads.
+    """
+
+    def __init__(self, client, truncate_dim: int = EMBED_DIM):
+        self._client = client          # XaiEmbeddingClientHttp
+        self.truncate_dim = truncate_dim
+
+    def _normalize_and_truncate(self, raw: np.ndarray) -> list[float]:
+        emb = raw[: self.truncate_dim]
+        norm = np.linalg.norm(emb)
+        return (emb / norm).tolist() if norm > 0 else emb.tolist()
+
+    async def embed(self, post) -> list[float]:
+        """Return a 1024-d unit-norm embedding for a post (text + media)."""
+        text, images = render_post_for_embedding(post)
+        raw = await self._client.encode_async(text, images or None)
+        return self._normalize_and_truncate(np.array(raw))
+
+
+class ClassifierHead:
+    """Single linear head on top of a frozen embedder output."""
+
+    def __init__(self, weight: np.ndarray, bias: np.ndarray):
+        # weight shape: (num_classes, EMBED_DIM)
+        self.W = weight
+        self.b = bias
+
+    def predict(self, embedding: list[float]) -> np.ndarray:
+        x = np.array(embedding)
+        logits = self.W @ x + self.b
+        return softmax(logits)    # or sigmoid for multi-label
+```
+
+> **Grok-1 note:** The Grox recsys embedding model is derived from the
+> Grok-1 transformer architecture (xai-org/grok-1, Apache 2.0). Teams
+> adopting this pattern inherit the Grok-1 model weights and serving
+> requirements; plan GPU memory and inference latency accordingly.[^grox-grok1]
+
+[^grox-grok1]: xai-org/grok-1 (Apache 2.0) is the upstream transformer;
+Grox adapts its encoder layers for recommendation-specific dense
+retrieval. See https://github.com/xai-org/grok-1 for weight artifacts.
+
+### 6.3 Classifier Heads on Top of Embeddings
+
+Once the embedder produces a 1024-d vector for a post, any number of
+downstream classification tasks attach as thin heads. Grox ships three
+primary classifiers that all share the same frozen embedder output —
+compute cost is dominated by the single embedding pass, not the heads.
+
+**Classifier types and output shapes:**
+
+- **Spam classifier** — binary head (2-class softmax). Output:
+  `{spam: float, not_spam: float}`. Threshold tuned per surface; default
+  p(spam) > 0.85 triggers suppression.
+- **Content category classifier** — multi-label head (sigmoid per
+  category). Output: `{category: str, score: float}[]` for all categories
+  above a minimum confidence floor (typically 0.30). Maps to the same
+  taxonomy defined in Section 4 so downstream systems need no schema
+  change.
+- **PTOS (Platform Terms of Service) policy classifier** — multi-class
+  severity head. Output: `{severity: LOW | MEDIUM | HIGH | BLOCK,
+  policy_type: str}`. Feeds directly into the trust-safety enforcement
+  layer (see trust-safety.md §6.2).
+- **Reply-ranking quality classifier** — binary quality signal used to
+  re-rank replies. Output: `{high_quality: float}`. Shares the same
+  frozen embedder; trained on reply engagement labels.
+
+**Training economics:** One shared embedder amortizes the dominant
+compute cost. Fine-tuning only the classifier heads (while keeping the
+embedder frozen) reduces GPU-hours per new task by roughly 10-20x
+compared to training a dedicated model per classification objective. When
+embedding quality needs to improve, a single embedder re-train propagates
+improvements to all heads simultaneously.
+
+### 6.4 Task Dispatcher + Engine
+
+Grox routes the incoming post stream through a Dispatcher that maps each
+post to one or more classification tasks, and an Engine that schedules
+and executes those tasks against the shared embedder and classifier heads.
+The Dispatcher maintains in-flight sets and retry budgets; the Engine owns
+PlanMaster execution and response queuing.
+
+```python
+# Adapted from grox/dispatcher.py — illustrative routing schema.
+# Shows how stream generators feed the task queue.
+
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Optional
+
+class TaskType(Enum):
+    POST_CLASSIFY   = "post_classify"    # spam + category + PTOS
+    POST_EMBED_V5   = "post_embed_v5"    # embedding only (for ANN index)
+    SAFETY_PTOS     = "safety_ptos"      # PTOS-only fast path
+    REPLY_RANKING   = "reply_ranking"    # reply quality signal
+
+@dataclass
+class TaskPayload:
+    payload_id: str
+    task_type: TaskType
+    post_id: str
+    attempt: int = 0
+    seen_bloom_key: Optional[str] = None  # bloom-filter dedup key
+
+def route_post(post_id: str, is_reply: bool, seen: BloomFilter) -> TaskPayload:
+    """Route a post to the appropriate classification task."""
+    bloom_key = f"grox:{post_id}"
+    if seen.check(bloom_key):
+        return None                 # already processed; skip
+    task_type = TaskType.REPLY_RANKING if is_reply else TaskType.POST_CLASSIFY
+    seen.add(bloom_key)
+    return TaskPayload(
+        payload_id=f"{task_type.value}:{post_id}",
+        task_type=task_type,
+        post_id=post_id,
+        seen_bloom_key=bloom_key,
+    )
+```
+
+The Dispatcher integrates a bloom filter at the routing layer to prevent
+duplicate classification work on posts that re-enter the stream (e.g.
+viral reposts or recovery replay). A post whose bloom key is already
+present is dropped before entering the task queue, keeping queue depth
+proportional to unique post volume rather than raw event volume. Bloom
+false-positive rates of 0.1% at the expected 1M-post/day volume cost
+roughly 2 MB of filter memory per 24-hour window with standard decay.
+
+### 6.5 Decision Pseudocode — Grox vs Baseline Inverted Index
+
+Use this table to decide which approach fits your current constraints.
+Neither is universally better — the right choice depends on volume,
+language diversity, and available infrastructure.
+
+| Dimension              | Baseline (inverted index) | Grox (transformer)         |
+|------------------------|---------------------------|----------------------------|
+| Latency per post       | < 1 ms (CPU, in-process)  | 20-80 ms (GPU inference)   |
+| Infrastructure cost    | Minimal (dict lookup)     | GPU cluster required       |
+| Cross-lingual support  | Requires per-language lists | Single model, any language |
+| Cross-modal support    | Text only                 | Text + image + video       |
+| Interpretability       | High (keyword audit trail)| Low (embedding black box)  |
+| Cold-start (new topic) | Requires list update      | Generalizes from embeddings|
+| Maintenance burden     | Grows with category count | Fixed after embedder train |
+| Rollback simplicity    | Trivial (edit keyword list)| Model version management   |
+
+**Rule of thumb:** Use the inverted index if your pipeline handles fewer
+than 100K posts/day in a single language and your category set is stable.
+Switch to Grox-style transformer classification when you have cross-modal
+content, multi-lingual traffic, or 1M+ posts/day where keyword list
+maintenance cost exceeds the cost of GPU inference infrastructure.
+
+### 6.6 Trade-offs vs Baseline Inverted Index
+
+Choosing the transformer path involves real operational costs that teams
+frequently underestimate. This section documents the trade-offs honestly
+rather than presenting Grox as a strict upgrade.
+
+- **Interpretability: inverted index wins.** When a post is misclassified
+  under the inverted index, you can audit the keyword match directly and
+  add or remove terms. With a transformer classifier the decision is
+  distributed across 1024 embedding dimensions with no single auditable
+  signal. Debugging requires embedding visualization tools (UMAP/t-SNE)
+  and adversarial probing — substantially higher engineering overhead.
+- **Cross-lingual and cross-modal coverage: transformer wins.** A single
+  Grox embedder classifies Arabic, Japanese, and Portuguese posts without
+  per-language keyword maintenance. Multimodal posts (recipe video with
+  minimal caption text) that score zero under the inverted index produce
+  meaningful embeddings from the visual content. This is the primary
+  driver for the scale-tier switch.
+- **Operational cost: inverted index is 10-100x cheaper.** A keyword
+  lookup runs on commodity CPU in microseconds. A Grox embedding pass
+  requires a GPU inference call with 20-80 ms round-trip latency and
+  significant per-token compute. At 1M posts/day with a 50 ms average
+  embedding latency you need roughly 600 GPU-seconds of inference per
+  day — plan accordingly before committing to the transformer path.
+- **Debugging and rollback: inverted index wins.** Rolling back a
+  keyword list update is a config file revert. Rolling back a classifier
+  head requires a model registry, versioned artifacts, and a staged
+  rollout process. Teams without existing ML deployment infrastructure
+  should build that foundation before adopting Grox-style classifiers.
+
+**Hybrid pragma:** In production, a pragmatic approach is to run both
+tiers in parallel for a transition period — use the inverted index for
+hard-block decisions (known spam domains, explicit policy violations with
+deterministic keyword triggers) while Grox handles soft signals (content
+category confidence, cross-modal quality scoring, language-independent
+PTOS assessment). This preserves the inverted index's auditability for
+enforcement paths while gaining transformer coverage for recommendation
+quality signals.
