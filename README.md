@@ -65,6 +65,9 @@ cp -r data-algo-skill/data-algo-system ~/.claude/commands/data-algo-system
 
 # Social platform patterns (ranking, signals, content moderation)
 cp -r data-algo-skill/data-algo-social ~/.claude/commands/data-algo-social
+
+# Financial trading strategies (backtesting, confluence, execution drag)
+cp -r data-algo-skill/data-algo-fin ~/.claude/commands/data-algo-fin
 ```
 
 #### Project-level
@@ -172,6 +175,23 @@ System design algorithms for production-scale infrastructure. 6 reference files 
 | English | `load balancer` · `rate limit` · `caching` · `sharding` · `consensus` · `replication` · `distributed` · `bloom filter` |
 | Chinese | `负载均衡` · `限流` · `缓存策略` · `分片` · `一致性` · `副本` · `分布式` · `布隆过滤器` |
 
+### data-algo-fin
+
+Trading strategy consultant for backtesting, paper-vs-live diagnosis, and Pine/Python strategy implementation. 5 reference files covering 8 archetypal patterns, evaluation metrics, multi-signal confluence design, live execution drag, and Chinese-English finance terminology.
+
+| File | Contents |
+|------|----------|
+| `strategy-patterns.md` | 8 patterns: mean-revert, momentum, breakout, market-making, pair, vol-arb, carry, event-driven — with regime fit + typical Sharpe ranges |
+| `metrics.md` | Sharpe, Sortino, Calmar, MaxDD, profit factor, expectancy, R-multiple, MFE/MAE with threshold heuristics + sample-size requirements |
+| `confluence.md` | 2-of-N gate design, signal independence, score-based vs AND-gate vs veto patterns, tuning sweeps |
+| `execution.md` | 8 sources of backtest-vs-live drag: look-ahead, spread, slippage, latency, partial fills, funding, adverse selection, outages |
+| `glossary-fin.md` | Chinese-English finance terminology + colloquial-to-pattern mapping ("做多" → long, "想抓住趋势" → momentum) |
+
+| Language | Keywords |
+|----------|----------|
+| English | `backtest` · `strategy` · `Sharpe` · `MFE` · `MAE` · `confluence` · `regime` · `slippage` · `funding` · `Pine` · `indicator` |
+| Chinese | `回测` · `策略` · `夏普` · `回撤` · `胜率` · `止损` · `突破` · `均值回归` · `滑点` · `资金费率` |
+
 ### data-algo-viz
 
 Renders algorithm analysis as terminal UI (via [`@json-render/ink`](https://github.com/vercel-labs/json-render)) or self-contained HTML reports with Playwright screenshots.
@@ -225,6 +245,9 @@ data-algo-skill/
 ├── data-algo-system/                # System design
 │   ├── SKILL.md
 │   └── references/                  # 6 files
+├── data-algo-fin/                   # Trading strategies
+│   ├── SKILL.md
+│   └── references/                  # 5 files
 ├── data-algo-viz/                   # Visualization
 │   ├── SKILL.md
 │   ├── scripts/                     # render.mjs + package.json

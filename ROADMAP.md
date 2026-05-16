@@ -6,9 +6,9 @@
 
 ---
 
-## Current State (v1.1)
+## Current State (v1.2)
 
-Five skill branches shipped and field-tested:
+Six skill branches shipped and field-tested:
 
 | Branch | References | Coverage |
 |--------|-----------|----------|
@@ -16,9 +16,10 @@ Five skill branches shipped and field-tested:
 | **data-algo-social** | 6 files | Twitter/X recommendation patterns for social platforms |
 | **data-algo-competitive** | 6 files | Competitive programming: segment trees, FFT/NTT, advanced graphs, geometry |
 | **data-algo-system** | 6 files | System design: load balancing, caching, sharding, consensus, rate limiting |
+| **data-algo-fin** | 5 files | Trading strategies: 8 patterns, backtest metrics, confluence design, execution drag |
 | **data-algo-viz** | 5 templates | Terminal + HTML visualization via @json-render/ink + Playwright |
 
-24 reference files, 11 knowledge sources, ~400+ algorithms/patterns across all branches.
+29 reference files, 12 knowledge sources, ~400+ algorithms/patterns + 8 trading patterns across all branches.
 
 Plus tooling: `.algo-profile/` snapshot system.
 
@@ -48,6 +49,7 @@ Contributions welcome — add reference files following the existing branch stru
 |--------|---------|--------|
 | **data-algo-competitive** | Competitive programming templates (segment trees, FFT/NTT, advanced graphs, geometry) | ✅ Shipped |
 | **data-algo-system** | System design patterns (load balancing, sharding, caching, consensus, rate limiting) | ✅ Shipped |
+| **data-algo-fin** | Trading strategies (8 patterns, backtest metrics, confluence gates, execution drag) | ✅ Shipped |
 | **data-algo-ml** | ML algorithm patterns (gradient descent, backprop, attention, transformers) | Planned |
 
 ### Viz Upgrades

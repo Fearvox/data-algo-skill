@@ -65,6 +65,9 @@ cp -r data-algo-skill/data-algo-system ~/.claude/commands/data-algo-system
 
 # 社交平台模式（排序、信号、内容审核）
 cp -r data-algo-skill/data-algo-social ~/.claude/commands/data-algo-social
+
+# 金融交易策略（回测、confluence 设计、执行偏差）
+cp -r data-algo-skill/data-algo-fin ~/.claude/commands/data-algo-fin
 ```
 
 #### 项目级安装
@@ -172,6 +175,23 @@ cd ~/.claude/commands/data-algo-viz/scripts && npm install
 | 中文 | `负载均衡` · `限流` · `缓存策略` · `分片` · `一致性` · `副本` · `分布式` · `布隆过滤器` |
 | English | `load balancer` · `rate limit` · `caching` · `sharding` · `consensus` · `replication` · `distributed` · `bloom filter` |
 
+### data-algo-fin
+
+交易策略咨询：回测分析、回测-实盘差异诊断、Pine/Python 策略实现。5 个参考文件，覆盖 8 个原型策略、回测评估指标、多信号 confluence 设计、live 执行偏差、中英金融术语。
+
+| 文件 | 内容 |
+|------|------|
+| `strategy-patterns.md` | 8 种策略：mean-revert、momentum、breakout、market-making、pair、vol-arb、carry、event-driven——含市场状态适配 + 典型 Sharpe 范围 |
+| `metrics.md` | Sharpe、Sortino、Calmar、MaxDD、profit factor、expectancy、R-multiple、MFE/MAE 的阈值启发 + 样本量要求 |
+| `confluence.md` | 2-of-N 门设计、信号独立性、score 模式 vs AND-gate vs veto 模式、调参 sweep |
+| `execution.md` | 回测-实盘偏差 8 大来源：look-ahead、点差、滑点、延迟、部分成交、资金费率、adverse selection、宕机 |
+| `glossary-fin.md` | 中英金融术语 + 口语→pattern 映射（"做多" → long，"想抓住趋势" → momentum） |
+
+| 语言 | 关键词 |
+|------|--------|
+| 中文 | `回测` · `策略` · `夏普` · `回撤` · `胜率` · `止损` · `突破` · `均值回归` · `滑点` · `资金费率` |
+| English | `backtest` · `strategy` · `Sharpe` · `MFE` · `MAE` · `confluence` · `regime` · `slippage` · `funding` · `Pine` · `indicator` |
+
 ### data-algo-viz
 
 将算法分析渲染为终端 UI（通过 [`@json-render/ink`](https://github.com/vercel-labs/json-render)）或自包含 HTML 报告 + Playwright 截图。
@@ -222,6 +242,9 @@ data-algo-skill/
 ├── data-algo-competitive/           # 竞赛编程
 │   ├── SKILL.md
 │   └── references/                  # 6 个文件
+├── data-algo-fin/                   # 交易策略
+│   ├── SKILL.md
+│   └── references/                  # 5 个文件
 ├── data-algo-system/                # 系统设计
 │   ├── SKILL.md
 │   └── references/                  # 6 个文件
