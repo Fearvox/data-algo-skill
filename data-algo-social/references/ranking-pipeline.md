@@ -685,3 +685,231 @@ After deploying a ranking pipeline, track these metrics per surface:
 - **Latency p50 / p95 / p99** -- must stay within budget per stage.
 - **Fallback rate** -- how often the chronological fallback is triggered.
 - **Score distribution shift** -- monitor for model drift via score histogram divergence.
+
+---
+
+## 6. Scale Tier — Phoenix Transformer-grade Ranking
+
+The sections above (§1-§5) describe a battle-tested cascading ranker built on hand-engineered
+features. That architecture is the right default for most platforms. This section describes the
+next tier: a transformer-based system for teams with the ML budget, GPU infrastructure, and
+data volume to justify the investment. Read this section if you are auditing how X/Twitter
+actually works today or planning a future migration path.
+
+### 6.1 When you reach this
+
+This tier becomes cost-effective when your platform crosses approximately 1 million posts per
+day, you have a dedicated ML team, and you have the GPU budget to run transformer inference at
+query time. Below that threshold the hand-engineered cascading ranker in §1-§4 will outperform
+anything more complex on a cost-per-quality basis.
+
+Go/no-go signals:
+
+- **Go**: You have >1M posts/day, a dedicated ML team, and GPU serving infra already in place.
+- **Go**: You need cross-lingual or cross-modal ranking where feature engineering cannot keep up
+  with language and content-type expansion.
+- **No-go**: Your ranking latency budget is <10 ms end-to-end — transformer inference adds
+  20-50 ms at minimum even with quantized models.
+- **No-go**: You lack A/B experimentation infrastructure; a botched transformer rollout is hard
+  to diagnose without per-variant metrics.
+
+Cross-ref: `data-algo-social/SKILL.md` Tier Guide for a five-row selection matrix.
+
+### 6.2 Two-Tower Retrieval (replaces Light Ranker)
+
+> **Canonical home for the two-tower model.** `candidate-generation.md §7.3` cross-references
+> this section rather than duplicating the architecture.
+
+The two-tower model replaces the light ranker's score-and-slice logic with a learned similarity
+search. A user tower encodes the user's features and engagement history through a transformer,
+producing a normalized embedding `[B, D]`. A separate candidate tower projects each item's post
+and author hashes to the same embedding space `[N, D]`, then top-K candidates are retrieved via
+approximate nearest neighbor (ANN) dot-product search over the pre-computed corpus.
+
+```python
+# Adapted from phoenix/recsys_retrieval_model.py (Apache 2.0, xAI 2026)
+# Illustrative — not production training code.
+EPS = 1e-12
+
+def candidate_tower(post_author_emb, proj_1, proj_2):
+    # Two-layer MLP with SiLU, then L2-normalize for dot-product ANN
+    # post_author_emb: [B, C, num_hashes * D_raw]
+    hidden = jax.nn.silu(post_author_emb @ proj_1)  # [B, C, D*2]
+    cand = hidden @ proj_2                           # [B, C, D]
+    norm = jnp.sqrt(jnp.maximum(jnp.sum(cand**2, axis=-1, keepdims=True), EPS))
+    return cand / norm                               # [B, C, D] L2-normalized
+
+def retrieve_top_k(user_repr, corpus_emb, top_k, corpus_mask=None):
+    # user_repr: [B, D] L2-normalized; corpus_emb: [N, D] pre-computed
+    scores = jnp.matmul(user_repr, corpus_emb.T)    # [B, N]
+    if corpus_mask is not None:
+        scores = jnp.where(corpus_mask[None, :], scores, -1e12)
+    return jax.lax.top_k(scores, top_k)             # ([B,K] indices, [B,K] scores)
+```
+
+The ANN step is the key operational decision. In-process `jnp.matmul` works up to ~10M items on
+a single accelerator; at larger corpus sizes you need a dedicated ANN service (FAISS, ScaNN, or
+an internal approximate-dot-product index) with a refresh cadence of minutes to hours. The
+corpus can be pre-computed offline and hot-swapped without downtime, which gives you an
+important operational escape hatch during incidents.
+
+Three ANN trade-offs to evaluate before choosing an index:
+
+- **Recall vs latency**: Exact search (`jnp.matmul`) gives 100% recall at the cost of O(N)
+  per query; HNSW or IVF indexes trade a few percent recall for sub-millisecond latency.
+- **Index rebuild cost**: Corpus embeddings change whenever you retrain the candidate tower;
+  plan for at least hourly index rebuilds and a staged swap (old index serves while new one
+  warms up).
+- **Corpus freshness**: A stale corpus silently degrades recall for new posts. Monitor
+  corpus p99 age against your content freshness SLA.
+
+### 6.3 Transformer Ranking with Candidate Isolation
+
+The transformer ranker replaces the heavy ranker. Instead of computing a feature vector per
+candidate and scoring each one independently, the transformer attends over the full sequence
+`[user | history | candidates]`. The critical design constraint is **candidate isolation**: a
+candidate's score must not depend on which other candidates happen to be in the same batch.
+
+Candidates are prevented from attending to each other via an explicit attention mask: each
+candidate position attends to user and history tokens freely but is blocked from attending to
+any other candidate position. The mask is applied inside the Grok-1-derived transformer
+kernel.[^grok1]
+
+```python
+# Adapted from phoenix/recsys_model.py (Apache 2.0, xAI 2026)
+# Illustrative — omits embedding lookup and RoPE position handling.
+# Sequence layout: [user(1) | history(S) | candidates(C)]
+
+def build_isolation_mask(seq_len, context_len, num_cands):
+    """Float mask [seq_len, seq_len]: 0.0=attend, -1e9=blocked.
+    Candidates attend to user+history freely; blocked from each other
+    except the diagonal (self-attention preserved).
+    """
+    mask = jnp.zeros((seq_len, seq_len))
+    # Build off-diagonal block for candidate rows/cols
+    c_start = context_len
+    cand_idx = jnp.arange(num_cands) + c_start
+    # vectorized: set entire C×C block to -inf, then restore diagonal
+    rows, cols = jnp.meshgrid(cand_idx, cand_idx, indexing='ij')
+    off_diag = rows != cols
+    mask = mask.at[rows, cols].set(jnp.where(off_diag, -1e9, 0.0))
+    return mask   # added to pre-softmax attention scores
+
+def phoenix_rank(embeddings, padding_mask, cand_offset, transformer, unembed):
+    # embeddings: [B, 1+S+C, D];  cand_offset = 1 + S
+    T = embeddings.shape[1]
+    C = T - cand_offset
+    mask = build_isolation_mask(T, cand_offset, C)
+    out = transformer(embeddings, padding_mask, extra_mask=mask)
+    # layer-norm then project only candidate positions to action logits
+    cand_out = layer_norm(out.embeddings[:, cand_offset:, :])  # [B, C, D]
+    return jnp.dot(cand_out, unembed)                          # [B, C, num_actions]
+```
+
+The model produces multi-task logits `[B, C, num_actions]` in a single forward pass, covering
+P(like), P(reply), P(repost), P(click), P(dwell), and additional continuous predictions for
+engagement signals like dwell time. All action heads share the transformer backbone — only the
+final projection differs per action.
+
+[^grok1]: Phoenix's transformer is ported from the Grok-1 open-source release:
+<https://github.com/xai-org/grok-1>. The core architecture (attention layers, layer norm,
+RoPE positions) is unchanged; Phoenix adds custom input embeddings and the candidate-isolation
+masking described above.
+
+### 6.4 No Hand-Engineered Features
+
+The Phoenix transformer eliminates the feature engineering phase entirely. Instead of
+pre-computing author follower count, content age buckets, engagement-rate-last-7-days, and
+dozens of similar signals, the model learns equivalent representations from raw engagement
+history embeddings. Post ID, author ID, and user ID are hashed into lookup tables; the
+transformer learns which combinations of hashes predict future engagement.
+
+This eliminates a substantial ongoing engineering cost — feature pipelines require data
+freshness monitoring, backfill jobs, schema migrations, and cross-team coordination every time
+a new signal is added. The transformer treats each engagement event in the history sequence as
+a full first-class input and jointly attends over all of them.
+
+Trade-off table:
+
+| Criterion | Hand-engineered features | Transformer (Phoenix-grade) |
+|---|---|---|
+| Interpretability | High — each feature has a name and range | Low — latent embeddings are opaque |
+| Debugging | Straightforward — inspect feature values on bad examples | Difficult — requires probing classifiers or attention analysis |
+| Rollback granularity | Fine — remove one feature, re-score | Coarse — requires full model rollback |
+| Cross-lingual quality | Poor — language-specific features break on new locales | Strong — shared embedding space generalizes across languages |
+| Cross-modal (image/video) | Poor — features are modality-specific | Strong — modality can be encoded as a hash signal |
+| Training data requirement | Low — features work from day one | High — needs millions of labeled engagement events before quality matches baseline |
+| Serving latency | Low — feature lookup + shallow model | Higher — transformer inference even at int8 adds 20-50 ms |
+
+Operational impact: model quality becomes a function of training data freshness rather than
+feature engineering currency. The deployment cadence shifts from "ship a new feature when
+ready" to "checkpoint and validate the continuously-trained model on a regular release cycle".
+This is a fundamentally different operational posture — plan accordingly before committing to
+the migration.
+
+Practically, the trade-off in interpretability has downstream effects on incident response: when
+a transformer-ranked feed degrades (e.g., surfacing low-quality content spike), debugging
+requires comparing activation distributions and per-candidate logit histograms rather than
+inspecting named feature values. Build model observability tooling before you cut over to
+production, not after.
+
+### 6.5 Weighted Scorer + Author Diversity Scorer
+
+After the transformer produces per-action logits, the ranking pipeline aggregates them into a
+single scalar score using a weighted linear combination. The weights are surface-specific and
+encode product priorities — for a "For You" home timeline, replies might be weighted higher
+than reposts; for a trending-topics surface, clicks may outweigh dwell time.
+
+```python
+# Adapted from phoenix/run_pipeline.py (Apache 2.0, xAI 2026)
+# Illustrative — surface weights are runtime configuration, not hardcoded.
+
+def weighted_score(logits, action_weights):
+    # logits: [B, C, num_actions]; action_weights: [num_actions]
+    probs = jax.nn.sigmoid(logits)           # per-action P(engagement)
+    return jnp.dot(probs, action_weights)    # [B, C] scalar ranking score
+
+def author_diversity_penalize(scores, author_ids, max_per_author=3):
+    # Exponential penalty once an author exceeds the per-feed slot budget.
+    # Softer than hard capping — high-signal posts still surface at reduced score.
+    author_count, adjusted = {}, []
+    for s, aid in zip(scores, author_ids):
+        n = author_count.get(aid, 0)
+        adjusted.append(s * 0.5 ** max(0, n - (max_per_author - 1)))
+        author_count[aid] = n + 1
+    return adjusted
+```
+
+The author diversity scorer is applied after the weighted scorer and uses exponential penalty
+rather than hard capping — this preserves the ability to surface a popular author's sixth post
+if its predicted engagement genuinely dominates all remaining candidates, at a progressively
+reduced score. Hard capping would discard that signal entirely.
+
+### 6.6 Upgrade Path from Baseline
+
+Migrating from the hand-engineered cascading ranker to a Phoenix-grade transformer is a
+significant infrastructure commitment, not a drop-in model swap. Use this checklist to
+evaluate readiness before starting:
+
+- [ ] **Data volume**: Are you at >1M posts/day sustained? Transformer quality degrades sharply
+      below this threshold relative to the simpler baseline.
+- [ ] **Engagement labels**: Do you have at least 6 months of logged engagement events with
+      correct impression attribution? The model cannot generalize without dense label coverage.
+- [ ] **GPU serving budget**: Transformer inference requires accelerated serving. Estimate cost
+      at your p95 QPS before signing off — the bill is often 10-20x the baseline CPU serving
+      cost.
+- [ ] **A/B experimentation infra**: You must be able to run side-by-side traffic splits for
+      weeks. Transformer models often show regression on rare content types that only surface
+      in long-tail exposure.
+- [ ] **ML team ownership**: Phoenix-grade systems require continuous training, checkpoint
+      validation, and model health dashboards. A one-person team cannot operate this safely.
+- [ ] **Latency headroom**: Add at least 30 ms to your current ranking latency budget before
+      committing. Transformer inference with a 128-dim 4-layer model adds ~20-50 ms at int8
+      precision on modern hardware.
+
+Reversibility and parallel operation: the transformer ranker can run alongside the baseline
+cascading ranker during migration. A feature flag routes a percentage of traffic to the
+transformer output while the rest continues to use the existing weighted scorer — this gives
+you the A/B split you need without a flag-day cutover. If the transformer underperforms on a
+specific surface, the flag can be reversed in minutes. Plan for at least 4-8 weeks of parallel
+operation before considering a full cutover.
