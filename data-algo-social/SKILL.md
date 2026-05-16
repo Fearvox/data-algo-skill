@@ -44,6 +44,16 @@ Inherited from `data-algo`. All output matches the user's language. Technical te
 | Quality Score | 质量分 |
 | Toxicity Filter | 毒性过滤 |
 | PageRank / Reputation | 声誉分 / 影响力分 |
+| Phoenix (transformer ranker) | Phoenix (Transformer 排序器) |
+| Grox (content understanding) | Grox (内容理解) |
+| Home Mixer (orchestration) | Home Mixer (编排层) |
+| Thunder (in-network store) | Thunder (网内候选存储) |
+| Hydrator (signal enrichment) | Hydrator / 信号注水器 |
+| Candidate isolation | 候选隔离 |
+| Two-Tower retrieval | 双塔召回 |
+| Attention masking | 注意力掩码 |
+| Brand safety | 品牌安全 |
+| PTOS policy | PTOS 政策 (平台服务条款) |
 
 These supplement the base `data-algo` Chinese templates (`## 诊断`, `## 推荐方案`, `## 已交付`, etc.). When generating reports, use these social-specific terms in section headers and descriptions.
 
@@ -71,6 +81,18 @@ This skill is backed by 6 reference files derived from Twitter/X's open-source r
 
 You don't need to load all 6 for every invocation. Pick the one(s) that match the user's immediate problem. For multi-stage projects, start with the earliest pipeline stage (usually signal collection) and work forward.
 
+## Tier Guide — Baseline vs Scale
+
+Every reference file uses a two-tier structure. Pick the tier matching your project's scale and ML budget.
+
+| Reader profile | Tier to follow | Why |
+|----------------|----------------|-----|
+| Building a collector for a single platform (Douyin, XHS, IG, etc.) | Baseline | Tier scale already covers M-row scale via classical ML |
+| 10K-1M posts/day, no ML team | Baseline (Growth variant) | Cascading ranker + hand features fits the constraint |
+| 1M+/day, ML team, GPU budget | Scale Tier | Transformer architecture pays off at this scale |
+| Auditing how X/Twitter actually works today | Scale Tier | Production architecture as of 2026-05-15 |
+| Want both: build with classical, plan transformer upgrade | Both — Baseline now, Scale Tier as the upgrade path roadmap | — |
+
 ## Social-Specific Workflow
 
 Same 5-phase structure as `data-algo` (Diagnose, Recommend, Decide, Ship, Visual Report), with social-platform-specific additions in the Diagnose phase.
@@ -96,18 +118,20 @@ Read the code and project context. In addition to the standard data-algo diagnos
 
 **Twitter Pattern Mapping:**
 
-| Your Problem | Twitter Subsystem | Reference |
-|-------------|------------------|-----------|
-| What signals to collect from a platform | unified-user-actions (UUA) | `signal-collection.md` |
-| How to recommend content to users | SimClusters + cr-mixer | `candidate-generation.md` |
-| How to rank a content feed | light-ranker → heavy-ranker | `ranking-pipeline.md` |
-| How to categorize / tag posts | topic-social-proof | `content-classification.md` |
-| How to score user influence / reputation | tweepcred (PageRank variant) | `graph-analysis.md` |
-| How to filter bad / low-quality content | visibility-filters + T&S models | `trust-safety.md` |
-| How to normalize cross-platform data | unified-user-actions schema | `signal-collection.md` |
-| How to find trending topics | engagement velocity + SimClusters | `candidate-generation.md` |
-| How to detect bot accounts | trust-and-safety-models | `trust-safety.md` |
-| How to predict user-user interaction | real-graph | `graph-analysis.md` |
+| Your Problem | Twitter 2023 (Baseline) | xAI 2026 (Scale Tier) |
+|-------------|------------------------|----------------------|
+| What signals to collect from a platform | unified-user-actions (UUA) | — |
+| How to recommend content to users | SimClusters + cr-mixer | Phoenix two-tower retrieval |
+| How to rank a content feed | light-ranker → heavy-ranker | Phoenix transformer (candidate isolation) |
+| How to categorize / tag posts | topic-social-proof | Grox transformer classifiers |
+| How to score user influence / reputation | tweepcred (PageRank variant) | — |
+| How to filter bad / low-quality content | visibility-filters + T&S models | Grox transformer classifiers |
+| How to normalize cross-platform data | unified-user-actions schema | — |
+| How to find trending topics | engagement velocity + SimClusters | Phoenix two-tower retrieval |
+| How to detect bot accounts | trust-and-safety-models | Grox transformer classifiers |
+| How to predict user-user interaction | real-graph | — |
+| In-network candidates | (none — implicit in cr-mixer) | Thunder (Kafka + in-memory store) |
+| Ads blending with brand safety | (not in 2023 release) | home-mixer/ads + brand-safety tracking |
 
 Present the social diagnosis as:
 
