@@ -697,3 +697,221 @@ User request: "show me my feed"
 | Cold-start coverage | % of new users with >= 50 candidates | > 90% |
 | Latency (p99) | Time to generate full candidate pool | < 200ms (hobby), < 500ms (scale) |
 | Candidate freshness | Median age of candidates at generation time | < 24h for home, < 1h for trending |
+
+---
+
+## 7. Scale Tier — Phoenix Retrieval + Thunder + Hydrators
+
+The sections above (§1–§6) describe the Baseline Tier: SimClusters, cr-mixer, UTEG, and FRS
+working together to recall ~1500 candidates. That architecture works well from hobby scale up
+through millions of posts per day using classical ML and hand-engineered features.
+
+This section documents the Scale Tier that xAI shipped on 2026-05-15 in `xai-org/x-algorithm`.
+It replaces implicit in-network logic with an explicit in-memory store (Thunder), replaces
+SimClusters ANN with a transformer-based two-tower retrieval model (Phoenix), and wraps every
+enrichment step in a composable hydrator pattern built on top of the CandidatePipeline framework.
+
+### 7.1 When you reach this
+
+The Scale Tier is worth adopting when your candidate generation hits two simultaneous ceilings:
+the cr-mixer recall ceiling (you are surfacing the same ~1500 posts repeatedly despite new
+content being available) and the ANN latency ceiling (SimClusters index refresh is too slow to
+keep up with content velocity). At that point you need both a dedicated in-network store and
+ML-driven out-of-network retrieval, which is exactly the combination Thunder and Phoenix provide.
+
+Go/no-go signals:
+
+- **Go**: You need dual in-network + out-of-network (OON) candidates from separate
+  infrastructure paths, and your in-network implicit fan-out is becoming a query bottleneck.
+- **Go**: You have an ANN index available (FAISS, ScaNN, or an internal dot-product service)
+  and a trained two-tower model or the ML budget to train one.
+- **Go**: Your content corpus exceeds ~10M items and ANN recall is falling below 95% with
+  your current SimClusters setup.
+- **No-go**: You are below ~1M posts per day — Thunder's Kafka ingestion overhead and
+  Phoenix's transformer inference cost will not pay for themselves at this scale.
+- **No-go**: You lack the operational infrastructure to run a persistent in-memory store with
+  hot-swap semantics; the failure modes are harder to debug than a cold cache miss.
+
+### 7.2 Thunder: In-Network Candidate Store
+
+Thunder is a Kafka-fed, in-memory post store that maintains per-user post indices so that
+in-network candidates can be retrieved with sub-millisecond lookup instead of re-querying a
+database or fan-out cache. Every new post is consumed from Kafka in real time, inserted into
+each relevant user index, and the index is auto-trimmed when it exceeds budget.
+
+Design dimensions and operational constraints:
+
+- **Retention window**: Posts are kept in the index for a configurable time window (default
+  in xAI source: recent activity window). Older posts beyond the retention horizon are
+  evicted by the trimmer, not a periodic batch job, keeping memory pressure steady.
+- **Per-user index types**: Each user has three sub-indices — originals (posts authored by
+  the followed user), reposts (reposts/quotes), and video (video posts, tracked separately
+  because they carry a distinct score signal). This matches the structure in
+  `thunder/posts/` and `thunder/kafka/`.
+- **Auto-trimming**: The index enforces a per-user and per-index-type post cap. When
+  ingestion pushes a user's index past the cap the oldest entries are evicted immediately,
+  not deferred. This bounds memory to a predictable envelope even during viral events.
+- **Memory budget planning**: A rough estimate is `num_active_users × avg_followed_accounts
+  × posts_per_window × bytes_per_post_record`. At 10M active users following 500 accounts
+  with a 48h window and 200B per record, Thunder requires roughly 500 GB of in-memory
+  state — sized for multi-node deployment behind a consistent-hash router.
+- **Write path**: Kafka consumer (`thunder/kafka/`) → deserializer (`deserializer.rs`) →
+  per-user index update → trim if over cap. The `thunder_service.rs` exposes a gRPC
+  interface for candidate fetch requests from home-mixer.
+
+Thunder replaces the implicit in-network logic described in §2 (Multi-Source Candidate
+Mixing). Rather than issuing a database query for "posts from accounts this user follows
+in the last N hours," home-mixer calls Thunder directly. This eliminates the fan-out
+query pattern that becomes a write amplification problem at high follow-graph density.
+
+### 7.3 Phoenix Retrieval: Out-of-Network ML Retrieval
+
+Phoenix retrieval is the out-of-network candidate path. It uses the same two-tower model
+that powers transformer-grade ranking to generate a dense user embedding on the query side
+and then runs approximate nearest neighbor search over a pre-computed corpus of post
+embeddings to return OON candidates the user is likely to engage with but does not
+currently follow.
+
+See `ranking-pipeline.md §6.2` for the two-tower model forward pass and similarity
+computation.[^grok1]
+
+Operational considerations when running Phoenix retrieval:
+
+- **ANN index build cadence**: The corpus embedding index is rebuilt on a scheduled cadence
+  (hourly or sub-hourly for high-velocity platforms). During the rebuild a shadow index is
+  warmed before the live index is hot-swapped, ensuring zero-downtime refresh.
+- **M-to-K funnel ratio**: Phoenix retrieval typically operates on a corpus of M = 10M–1B
+  items and returns K = 500–2000 candidates. Setting the M:K ratio too aggressively
+  (M > 100K:K) reduces recall; too conservatively increases latency. Target > 90% recall
+  at K.
+- **Refresh trade-offs**: More frequent index rebuilds improve content freshness but
+  increase GPU cost for embedding re-computation. A practical approach is to rebuild
+  user-tower embeddings at query time (cheap, always fresh) and rebuild the candidate-tower
+  corpus index on a scheduled cadence (expensive, can tolerate minutes of staleness).
+- **Corpus masking**: The `retrieve_top_k` function in `ranking-pipeline.md §6.2` accepts
+  an optional `corpus_mask` to exclude posts the user has already seen (using the
+  impression bloom filter described below in §7.4). Apply this mask at retrieval time,
+  not as a post-retrieval filter, to avoid wasting K slots on already-seen content.
+
+[^grok1]: Phoenix's transformer architecture is derived from Grok-1. See
+  https://github.com/xai-org/grok-1 for the base model architecture and weights.
+
+### 7.4 Hydrator Pattern (Generalizable Beyond xAI)
+
+Hydrators are named, pluggable enrichment units that attach additional context to either
+the query (user-side) or to individual candidates (item-side) before filtering and scoring.
+The pattern is platform-agnostic: each hydrator is a single-responsibility function with a
+defined input/output contract, executed in dependency order with a configurable criticality
+flag (`required` vs `best_effort`).
+
+**Query hydrators** (from `home-mixer/query_hydrators/`):
+
+- **Engagement history** — recent posts engaged with; feeds user-tower sequence (`user_action_seq_query_hydrator.rs`)
+- **Follow list** — followed + subscribed user IDs for Thunder lookup (`followed_user_ids_query_hydrator.rs`)
+- **Topic preferences** — explicit and inferred Grok Topics to bias OON retrieval (`followed_grok_topics_query_hydrator.rs`)
+- **Starter packs** — onboarding account bundles for cold-start coverage (`followed_starter_packs_query_hydrator.rs`)
+- **IP / region** — inferred locale for geo-filtering and trending (`ip_query_hydrator.rs`)
+- **Mutual follow graph** — pre-computed mutual-follow adjacency for scoring bias (`mutual_follow_query_hydrator.rs`)
+- **Served history** — post IDs served this session to enforce pagination dedup (`served_history_query_hydrator.rs`)
+- **Impression bloom filter** — probabilistic set of all posts shown last N days; masks ANN corpus (`impression_bloom_filter_query_hydrator.rs`)
+
+**Candidate hydrators** (from `home-mixer/candidate_hydrators/`):
+
+- **Engagement counts** — likes/replies/reposts from counts service; used as ranking features (`engagement_counts_hydrator.rs`)
+- **Brand safety** — classifier-derived sensitivity score for ads adjacency decisions (`ads_brand_safety_hydrator.rs`)
+- **Language** — detected language code for language-match filtering (`language_code_hydrator.rs`)
+- **Media detection** — video/image presence and video duration (`has_media_hydrator.rs`, `video_duration_candidate_hydrator.rs`)
+- **Quote-post expansion** — fetches quoted post metadata when candidate is a quote-post (`quote_hydrator.rs`)
+- **Mutual follow scores** — Jaccard similarity between author followers and query-user followers (`mutual_follow_jaccard_hydrator.rs`)
+
+**TypeScript hydrator interface and two concrete examples:**
+
+```typescript
+// Hydrator interface — adapted from candidate-pipeline/hydrator.rs concepts
+// (Apache 2.0, xAI 2026). Illustrative TypeScript schema, not production code.
+
+type HydratorCriticality = "required" | "best_effort";
+
+interface QueryHydrator<TContext, TAddition> {
+  name: string;
+  criticality: HydratorCriticality;
+  hydrate(ctx: TContext): Promise<TAddition>;
+}
+
+interface CandidateHydrator<TContext, TCandidate, TAddition> {
+  name: string;
+  criticality: HydratorCriticality;
+  hydrate(ctx: TContext, candidate: TCandidate): Promise<TAddition>;
+}
+
+// Example 1 — Query hydrator: attach impression bloom filter to request context
+const impressionBloomHydrator: QueryHydrator<
+  { userId: string; windowDays: number },
+  { bloomFilter: Uint8Array; falsePositiveRate: number }
+> = {
+  name: "impression_bloom_filter",
+  criticality: "best_effort",   // degraded gracefully if bloom store is down
+  async hydrate({ userId, windowDays }) {
+    const filter = await bloomStore.fetch(userId, windowDays);
+    return { bloomFilter: filter.bits, falsePositiveRate: filter.fpr };
+  },
+};
+
+// Example 2 — Candidate hydrator: attach mutual follow Jaccard score
+const mutualFollowJaccardHydrator: CandidateHydrator<
+  { queryUserFollowers: Set<string> },
+  { authorId: string },
+  { mutualFollowJaccard: number }
+> = {
+  name: "mutual_follow_jaccard",
+  criticality: "best_effort",
+  async hydrate({ queryUserFollowers }, { authorId }) {
+    const authorFollowers = await followGraph.getFollowers(authorId);
+    const intersection = [...queryUserFollowers].filter(x => authorFollowers.has(x));
+    const union = new Set([...queryUserFollowers, ...authorFollowers]);
+    return { mutualFollowJaccard: intersection.length / union.size };
+  },
+};
+```
+
+### 7.5 CandidatePipeline Framework Composition
+
+The CandidatePipeline framework (`home-mixer/candidate_pipeline/`,
+`candidate-pipeline/candidate_pipeline.rs`) formalizes Sources → Hydrators → Filters →
+Scorers → Selector as typed slots with dependency ordering, per-stage timeouts, and
+per-stage diagnostics. Stage ordering mirrors data dependencies: query hydrators first
+(sources consume their output), candidate hydrators after dedup (enrich each post once),
+filters after hydration (need labels), scorers last (need all signals), Selector terminal.
+
+```
+  Sources         Hydrators        Filters    Scorers     Selector
+  ───────         ─────────        ───────    ───────     ────────
+  Thunder ─┐   QueryHydrs ─┐   Quality                   top-K
+  Phoenix ──┤→  CandHydrs ─┤→  Safety  →  Weighted  →   pool
+  Trending ─┘  (parallel)   │  Mutes       Score
+                             └─ (serial)   Diversity
+```
+
+```python
+# Adapted from home-mixer/candidate_pipeline/ (Apache 2.0, xAI 2026).
+# Illustrative pseudocode — not production code.
+
+class CandidatePipeline:
+    def __init__(self, sources, query_hydrators, cand_hydrators,
+                 filters, scorers, selector):
+        self.sources, self.query_hydrators = sources, query_hydrators
+        self.cand_hydrators, self.filters   = cand_hydrators, filters
+        self.scorers, self.selector         = scorers, selector
+
+    def run(self, request):
+        ctx      = hydrate_query(request, self.query_hydrators)  # parallel
+        raw      = dedup_by_id(fetch_all(ctx, self.sources))
+        hydrated = hydrate_candidates(ctx, raw, self.cand_hydrators)
+        filtered = apply_filters(hydrated, self.filters)         # serial
+        scored   = score_all(ctx, filtered, self.scorers)
+        return self.selector.select(scored)                      # top-K
+```
+
+To migrate from the §6 cr-mixer pattern: parallel fetchers → Sources, enrichment
+callbacks → CandidateHydrators, quality gates → Filters, weighted mix → Scorer,
+final slice → Selector.
