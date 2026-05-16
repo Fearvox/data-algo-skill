@@ -23,6 +23,8 @@ Six skill branches shipped and field-tested:
 
 Plus tooling: `.algo-profile/` snapshot system.
 
+- **2026-05-16**: `data-algo-social` shipped Scale Tier content (xAI x-algorithm 2026-05-15 release) — Phoenix transformer ranking, Grox content understanding, hydrator pattern. Baseline (Twitter 2023) preserved alongside.
+
 ---
 
 ## Near-Term (v1.2)
