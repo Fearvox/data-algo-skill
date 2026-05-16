@@ -601,3 +601,69 @@ This mirrors Twitter's approach in the heavy ranker, where raw engagement counts
 - `content-classification.md` -- using signal patterns to categorize content
 - `graph-analysis.md` -- using follow/interaction signals to build user graphs
 - `trust-safety.md` -- using negative signals to filter harmful content
+
+---
+
+## 6. xAI 2026 Addition — Hydrator Pattern for Signal Composition
+### 6.1 What hydrators are
+
+A hydrator is a named, pluggable enrichment unit that fetches and attaches one
+category of data to a query context (user-side) or to an individual candidate
+(item-side). Each hydrator has a single responsibility and a declared criticality:
+`required` (pipeline halts on failure) or `best_effort` (silently skipped when
+unavailable). Hydrators compose in dependency order, making the enrichment graph
+explicit and auditable — unlike the monolithic enrichment functions typical in
+§4 (Collector Patterns) that bundle follow-list, counts, and language lookup
+into a single opaque call.
+
+### 6.2 Query hydrators vs Candidate hydrators
+
+**Query hydrators** attach user-context signals before any candidate is fetched
+(source: `home-mixer/query_hydrators/` in `xai-org/x-algorithm`):
+engagement history, follow list, topic preferences, impression bloom filter,
+mutual follow graph, starter packs, IP / region context, served history.
+**Candidate hydrators** attach item-level signals to each retrieved post before
+scoring (source: `home-mixer/candidate_hydrators/`):
+engagement counts, brand safety score, language detection, media type,
+quote-post expansion, mutual follow Jaccard score.
+
+### 6.3 Why this matters even at Baseline scale
+
+Decomposing enrichment into named units with declared criticality makes each unit
+independently testable and swappable without touching adjacent pipeline stages.
+A `best_effort` hydrator that calls a slow external API degrades gracefully
+rather than cascading a timeout through the whole pipeline. Three ops benefits:
+
+- **Independent rollout** — add one hydrator file to ship a new signal; no changes to collector or ranker.
+- **Partial degradation** — a counts-service outage drops engagement features while candidate delivery continues uninterrupted.
+- **SLA isolation** — per-hydrator timeouts bound one slow step without blowing the overall pipeline latency budget.
+
+### 6.4 TypeScript hydrator schema example
+
+Interfaces plus one query and one candidate example, adapted from `candidate-pipeline/` in `xai-org/x-algorithm` (Apache 2.0, illustrative):
+
+```typescript
+type Criticality = "required" | "best_effort";
+interface QueryHydrator<C, A> {
+  name: string; criticality: Criticality;
+  hydrate(ctx: C): Promise<A>;
+}
+interface CandidateHydrator<C, T, A> {
+  name: string; criticality: Criticality;
+  hydrate(ctx: C, candidate: T): Promise<A>;
+}
+// Query hydrator: impression bloom filter (best_effort — degrades if store is down)
+const bloomHydrator: QueryHydrator<
+  { userId: string; windowDays: number }, { bits: Uint8Array; fpr: number }
+> = {
+  name: "impression_bloom_filter", criticality: "best_effort",
+  async hydrate({ userId, windowDays }) { return bloomStore.fetch(userId, windowDays); },
+};
+// Candidate hydrator: engagement counts (best_effort — omit counts if service down)
+const countsHydrator: CandidateHydrator<
+  unknown, { postId: string }, { likes: number; replies: number; reposts: number }
+> = {
+  name: "engagement_counts", criticality: "best_effort",
+  async hydrate(_ctx, { postId }) { return countsService.fetch(postId); },
+};
+```
