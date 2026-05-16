@@ -50,7 +50,7 @@ Contributions welcome — add reference files following the existing branch stru
 | **data-algo-competitive** | Competitive programming templates (segment trees, FFT/NTT, advanced graphs, geometry) | ✅ Shipped |
 | **data-algo-system** | System design patterns (load balancing, sharding, caching, consensus, rate limiting) | ✅ Shipped |
 | **data-algo-fin** | Trading strategies (8 patterns, backtest metrics, confluence gates, execution drag) | ✅ Shipped |
-| **data-algo-ml** | ML algorithm patterns (gradient descent, backprop, attention, transformers) | Planned |
+| **data-algo-ml** | ML algorithm patterns (gradient descent, backprop, attention, transformers) | Confirmed (xai-org audit 2026-05-16) |
 
 ### Viz Upgrades
 
